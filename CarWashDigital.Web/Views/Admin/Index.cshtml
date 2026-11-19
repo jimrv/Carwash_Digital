@@ -1,0 +1,51 @@
+@model AdminDashboardVm
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Panel operativo";
+    ViewData["ActiveSection"] = "admin";
+    var kpis = new[] {
+        ("Reservas de hoy", Model.TodayBookingsCount),
+        ("Pendientes de ingreso", Model.PendingEntryCount),
+        ("En proceso", Model.InProgressCount),
+        ("Listos para recoger", Model.ReadyForPickupCount),
+        ("Cupos libres hoy", Model.FreeSlotsTodayCount),
+        ("Canceladas", Model.CancelledCount)
+    };
+}
+<h2>Panel operativo</h2>
+<div class="grid">
+  @foreach (var k in kpis)
+  {
+    <div class="card"><div class="kpi">@k.Item2</div>@k.Item1</div>
+  }
+</div>
+
+<h3 style="margin-top:24px">Próximas reservas</h3>
+@if (Model.UpcomingBookings.Any())
+{
+  <div class="tw">
+    <table>
+      <tr><th>Código</th><th>Cliente</th><th>Fecha</th><th>Servicio</th><th>Vehículo</th><th>Precio</th><th>Estado</th><th></th></tr>
+      @foreach (var b in Model.UpcomingBookings)
+      {
+        <tr>
+          <td>@b.BookingCode</td>
+          <td>@(b.User?.Name ?? "")</td>
+          <td>@b.Date.ToString("dd/MM/yyyy") @b.TimeSlot</td>
+          <td>@b.ServiceName</td>
+          <td>@b.VehicleBrand @b.VehiclePlate</td>
+          <td>S/ @b.Price</td>
+          <td><span class="pill">@b.Status</span></td>
+          <td><a href="/admin/reservas/@b.Id">Ver</a></td>
+        </tr>
+      }
+    </table>
+  </div>
+}
+else
+{
+  <div class="empty">No hay reservas confirmadas pendientes.</div>
+}
+
+<h3>Servicios más solicitados</h3>
+<p>@(Model.TopServices.Any() ? string.Join(" · ", Model.TopServices.Select(e => $"{e.Key}: {e.Value}")) : "Sin datos todavía.")</p>

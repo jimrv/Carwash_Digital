@@ -1,0 +1,44 @@
+@model TrackingVm
+@{ ViewData["Title"] = "Seguimiento del vehículo"; }
+<section class="s">
+  <h2>Seguimiento del vehículo</h2>
+  <div class="grid">
+    <div>
+      <form method="get" action="/seguimiento">
+        <label for="cd">Código de reserva</label>
+        <input id="cd" name="code" value="@Model.SearchCode" />
+        <p></p>
+        <button type="submit" class="btn">Consultar</button>
+      </form>
+    </div>
+    @if (Model.MyBookings.Any())
+    {
+      <div>
+        <label for="mb">O elige una de tus reservas</label>
+        <select id="mb" onchange="if(this.value) location.href='/seguimiento/' + encodeURIComponent(this.value)">
+          <option value="">Seleccionar</option>
+          @foreach (var b in Model.MyBookings)
+          {
+            <option value="@b.Code">@b.Code · @b.Date.ToString("dd/MM/yyyy") @b.TimeSlot</option>
+          }
+        </select>
+      </div>
+    }
+  </div>
+
+  @if (!string.IsNullOrWhiteSpace(Model.SearchCode))
+  {
+    if (Model.FoundBooking != null)
+    {
+      <div class="card" style="margin-top:20px">
+        <h3>@Model.FoundBooking.BookingCode · @Model.FoundBooking.VehicleBrand @Model.FoundBooking.VehicleModel</h3>
+        <p>@Model.FoundBooking.ServiceName · @Model.FoundBooking.Date.ToString("dd/MM/yyyy") @Model.FoundBooking.TimeSlot</p>
+        @await Html.PartialAsync("_BookingTracker", Model.FoundBooking)
+      </div>
+    }
+    else
+    {
+      <div class="empty">No encontramos una reserva con ese código. Revisa el código e inténtalo otra vez.</div>
+    }
+  }
+</section>

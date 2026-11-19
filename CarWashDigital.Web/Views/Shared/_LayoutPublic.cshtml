@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#16B9F2" />
+  <title>@(ViewData["Title"] ?? "Car Wash Digital")</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+  <div class="demo">Datos de demostración: precios, horarios y cupos son de ejemplo hasta definir la operación real.</div>
+  <header class="hd">
+    <div class="in">
+      <a href="/"><img src="/images/logo.jpg" alt="Car Wash Digital" /></a>
+      <nav aria-label="Navegación principal">
+        <a href="/">Inicio</a>
+        <a href="/servicios">Servicios y precios</a>
+        <a href="/como-funciona">Cómo funciona</a>
+        <a href="/seguimiento">Seguimiento</a>
+      </nav>
+      <button type="button" class="btn ghost-dark sm" data-theme-toggle aria-pressed="false">🌙 Oscuro</button>
+      @if (User.Identity?.IsAuthenticated == true)
+      {
+        var dashUrl = User.IsInRole("Admin") ? "/admin" : "/cliente";
+        <a href="@dashUrl" style="color:#fff;font-size:.92rem">Mi cuenta</a>
+      }
+      else
+      {
+        <a href="/login" style="color:#fff;font-size:.92rem">Iniciar sesión</a>
+      }
+      <a class="btn" href="/reservar/servicio">Reservar ahora</a>
+    </div>
+  </header>
+
+  <main>
+    @if (TempData["Success"] != null)
+    {
+      <div class="s" style="padding-bottom:0"><div class="alert">@TempData["Success"]</div></div>
+    }
+    @if (TempData["Error"] != null)
+    {
+      <div class="s" style="padding-bottom:0"><div class="alert er">@TempData["Error"]</div></div>
+    }
+    @RenderBody()
+  </main>
+
+  <footer class="ft">
+    <div class="in">
+      <a href="/servicios">Servicios</a>
+      <a href="/reservar/servicio">Reservas</a>
+      <a href="/seguimiento">Seguimiento</a>
+      <a href="/como-funciona">Preguntas frecuentes</a>
+      <a href="/como-funciona">Contacto</a>
+      <a href="/como-funciona">Términos y condiciones</a>
+      <a href="/como-funciona">Política de privacidad</a>
+    </div>
+  </footer>
+
+  <nav class="mobile-bar" aria-label="Acceso rápido móvil">
+    <a href="/">🏠<span>Inicio</span></a>
+    <a href="/servicios">🧼<span>Servicios</span></a>
+    <a href="/reservar/servicio">📅<span>Reservar</span></a>
+    <a href="/seguimiento">📍<span>Estado</span></a>
+    <a href="@(User.Identity?.IsAuthenticated == true ? (User.IsInRole("Admin") ? "/admin" : "/cliente") : "/login")">👤<span>Cuenta</span></a>
+  </nav>
+
+  <script src="/js/theme.js"></script>
+</body>
+</html>

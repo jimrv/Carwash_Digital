@@ -1,0 +1,49 @@
+@model IEnumerable<Vehicle>
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Mis vehículos";
+    ViewData["ActiveSection"] = "cliente/vehiculos";
+    var cats = new[] { "Sedán", "SUV", "Pick-up 4x4" };
+}
+<h2>Mis vehículos</h2>
+
+@if (Model.Any())
+{
+  <div class="grid">
+    @foreach (var v in Model)
+    {
+      <div class="card">
+        <h3>@v.Brand @v.Model</h3>
+        <p>@v.Category · @v.Plate @v.Color</p>
+        <form asp-controller="Client" asp-action="DeleteVehicle" asp-route-id="@v.Id" method="post" onsubmit="return confirm('¿Eliminar este vehículo? Tu historial se conserva.')">
+          @Html.AntiForgeryToken()
+          <button type="submit" class="btn d sm">Eliminar</button>
+        </form>
+      </div>
+    }
+  </div>
+}
+else
+{
+  <div class="empty">Aún no registraste vehículos.</div>
+}
+
+<h3 style="margin-top:24px">Agregar vehículo</h3>
+<form asp-controller="Booking" asp-action="AddVehicle" method="post">
+  @Html.AntiForgeryToken()
+  <input type="hidden" name="ReturnToBooking" value="false" />
+  <div class="grid">
+    <div><label for="vb2">Marca</label><input id="vb2" name="Brand" required /></div>
+    <div><label for="vm2">Modelo</label><input id="vm2" name="Model" required /></div>
+    <div>
+      <label for="vc2">Categoría</label>
+      <select id="vc2" name="Category">
+        @foreach (var c in cats) { <option>@c</option> }
+      </select>
+    </div>
+    <div><label for="vp2">Placa</label><input id="vp2" name="Plate" required /></div>
+    <div><label for="vo2">Color (opcional)</label><input id="vo2" name="Color" /></div>
+  </div>
+  <p></p>
+  <button type="submit" class="btn">Guardar vehículo</button>
+</form>

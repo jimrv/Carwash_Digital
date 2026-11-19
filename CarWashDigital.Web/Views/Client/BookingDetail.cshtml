@@ -1,0 +1,44 @@
+@model Booking
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = $"Reserva {Model.BookingCode}";
+    ViewData["ActiveSection"] = "cliente/reservas";
+    var pillCls = Model.Status == "Cancelada" ? "er" : (Model.Status == "Listo para recoger" || Model.Status == "Entregada" ? "ok" : (Model.Status == "Confirmada" ? "" : "wa"));
+    var canModify = Model.Status == "Confirmada";
+}
+<h2>Reserva @Model.BookingCode</h2>
+<div class="card" style="max-width:640px">
+  <p>
+    <b>@Model.ServiceName</b> <span class="pill @pillCls">@Model.Status</span><br />
+    Vehículo: @Model.VehicleBrand @Model.VehicleModel · @Model.VehicleCategory · @Model.VehiclePlate<br />
+    Fecha: @Model.Date.ToString("dd/MM/yyyy") @Model.TimeSlot<br />
+    Precio confirmado: <b>S/ @Model.Price</b>
+  </p>
+  <ul>
+    @foreach (var inc in Model.ServiceIncludes) { <li>@inc</li> }
+  </ul>
+
+  @await Html.PartialAsync("_BookingTracker", Model)
+
+  @if (canModify)
+  {
+    <p style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+      <form asp-controller="Client" asp-action="Reschedule" asp-route-id="@Model.Id" method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn s sm">Reprogramar</button>
+      </form>
+      <form asp-controller="Client" asp-action="Cancel" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('¿Cancelar esta reserva? Se liberará el cupo.')">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn d sm">Cancelar reserva</button>
+      </form>
+    </p>
+  }
+
+  <h3>Historial</h3>
+  <ul>
+    @foreach (var h in Model.History.OrderBy(x => x.ChangedAt))
+    {
+      <li>@h.Status · @h.ChangedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</li>
+    }
+  </ul>
+</div>

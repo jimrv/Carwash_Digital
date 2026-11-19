@@ -1,0 +1,48 @@
+@model IEnumerable<Booking>
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Reservas";
+    ViewData["ActiveSection"] = "admin/reservas";
+    var allStatuses = new[] { "Confirmada", "Ingresado", "En lavado", "En secado", "Listo para recoger", "Entregada", "Cancelada" };
+    var q = ViewBag.Query?.ToString() ?? "";
+    var statusFilter = ViewBag.StatusFilter?.ToString() ?? "";
+}
+<h2>Reservas</h2>
+<form method="get" action="/admin/reservas" class="grid" style="margin-bottom:16px">
+  <input name="q" value="@q" placeholder="Buscar por código, placa o cliente" />
+  <select name="status" onchange="this.form.submit()">
+    <option value="">Todos los estados</option>
+    @foreach (var st in allStatuses)
+    {
+      <option value="@st" selected="@(statusFilter == st)">@st</option>
+    }
+  </select>
+  <button type="submit" class="btn">Filtrar</button>
+</form>
+
+@if (Model.Any())
+{
+  <div class="tw">
+    <table>
+      <tr><th>Código</th><th>Cliente</th><th>Fecha</th><th>Servicio</th><th>Vehículo</th><th>Precio</th><th>Estado</th><th></th></tr>
+      @foreach (var b in Model)
+      {
+        var pillCls = b.Status == "Cancelada" ? "er" : (b.Status == "Listo para recoger" || b.Status == "Entregada" ? "ok" : (b.Status == "Confirmada" ? "" : "wa"));
+        <tr>
+          <td>@b.BookingCode</td>
+          <td>@(b.User?.Name ?? "")</td>
+          <td>@b.Date.ToString("dd/MM/yyyy") @b.TimeSlot</td>
+          <td>@b.ServiceName</td>
+          <td>@b.VehicleBrand @b.VehiclePlate</td>
+          <td>S/ @b.Price</td>
+          <td><span class="pill @pillCls">@b.Status</span></td>
+          <td><a href="/admin/reservas/@b.Id">Ver</a></td>
+        </tr>
+      }
+    </table>
+  </div>
+}
+else
+{
+  <div class="empty">No hay reservas para mostrar.</div>
+}

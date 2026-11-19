@@ -1,0 +1,47 @@
+@model Booking
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = $"Reserva {Model.BookingCode}";
+    ViewData["ActiveSection"] = "admin/reservas";
+    var nextStatus = ViewBag.NextStatus?.ToString();
+    var pillCls = Model.Status == "Cancelada" ? "er" : (Model.Status == "Listo para recoger" || Model.Status == "Entregada" ? "ok" : (Model.Status == "Confirmada" ? "" : "wa"));
+}
+<h2>Reserva @Model.BookingCode</h2>
+<div class="card" style="max-width:680px">
+  <p>
+    <b>@Model.ServiceName</b> <span class="pill @pillCls">@Model.Status</span><br />
+    Vehículo: @Model.VehicleBrand @Model.VehicleModel · @Model.VehicleCategory · @Model.VehiclePlate<br />
+    Fecha: @Model.Date.ToString("dd/MM/yyyy") @Model.TimeSlot<br />
+    Precio confirmado: <b>S/ @Model.Price</b><br />
+    Cliente: @(Model.User?.Name ?? "")
+  </p>
+  <ul>
+    @foreach (var inc in Model.ServiceIncludes) { <li>@inc</li> }
+  </ul>
+
+  @await Html.PartialAsync("_BookingTracker", Model)
+
+  <form asp-controller="Admin" asp-action="SaveNotes" asp-route-id="@Model.Id" method="post">
+    @Html.AntiForgeryToken()
+    <label for="ob">Observaciones internas</label>
+    <textarea id="ob" name="internalNotes">@Model.InternalNotes</textarea>
+    <p></p>
+    <button type="submit" class="btn s sm">Guardar observación</button>
+  </form>
+
+  @if (!string.IsNullOrEmpty(nextStatus) && Model.Status != "Cancelada")
+  {
+    <form asp-controller="Admin" asp-action="AdvanceStatus" asp-route-id="@Model.Id" method="post" style="margin-top:12px">
+      @Html.AntiForgeryToken()
+      <button type="submit" class="btn sm">Avanzar a: @nextStatus</button>
+    </form>
+  }
+
+  <h3>Historial</h3>
+  <ul>
+    @foreach (var h in Model.History.OrderBy(x => x.ChangedAt))
+    {
+      <li>@h.Status · @h.ChangedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") · @h.ChangedBy</li>
+    }
+  </ul>
+</div>

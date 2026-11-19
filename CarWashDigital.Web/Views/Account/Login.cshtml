@@ -1,0 +1,24 @@
+@model LoginVm
+@{ ViewData["Title"] = "Iniciar sesión"; }
+<div class="form">
+  <img class="logo" src="/images/logo.jpg" alt="Car Wash Digital" />
+  <h2>Iniciar sesión</h2>
+  <form asp-controller="Account" asp-action="Login" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div asp-validation-summary="ModelOnly" class="val-err"></div>
+
+    <label asp-for="Email">Correo electrónico</label>
+    <input asp-for="Email" type="email" required />
+    <span asp-validation-for="Email" class="val-err"></span>
+
+    <label asp-for="Password">Contraseña</label>
+    <input id="pwLogin" asp-for="Password" type="password" required />
+    <span asp-validation-for="Password" class="val-err"></span>
+
+    <p><input type="checkbox" style="width:auto;min-height:0" onclick="pwLogin.type=this.checked?'text':'password'" /> Mostrar contraseña</p>
+    <button type="submit" class="btn" style="width:100%">Iniciar sesión</button>
+  </form>
+  <p><a href="/recuperar">¿Olvidaste tu contraseña?</a> · <a href="/registro">Crear cuenta</a></p>
+  <small>Demo: cliente@demo.pe / demo123 · admin@demo.pe / admin123</small>
+</div>

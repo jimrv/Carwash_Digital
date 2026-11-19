@@ -1,0 +1,27 @@
+@model User
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Perfil";
+    ViewData["ActiveSection"] = "cliente/perfil";
+}
+<h2>Perfil</h2>
+<form class="card" style="max-width:460px" asp-controller="Client" asp-action="Profile" method="post">
+  @Html.AntiForgeryToken()
+  <label for="nm">Nombre</label>
+  <input id="nm" name="name" value="@Model.Name" required />
+
+  <label for="ph">Celular</label>
+  <input id="ph" name="phone" value="@Model.Phone" />
+
+  <label for="cn">Empresa / Flota (opcional)</label>
+  <input id="cn" name="companyName" value="@Model.CompanyName" />
+
+  <label for="rc">RUC (opcional)</label>
+  <input id="rc" name="ruc" value="@Model.Ruc" />
+
+  <label for="np">Nueva contraseña (opcional)</label>
+  <input id="np" name="newPassword" type="password" />
+
+  <p></p>
+  <button type="submit" class="btn">Guardar cambios</button>
+</form>

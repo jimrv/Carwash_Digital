@@ -1,0 +1,35 @@
+@model IEnumerable<Booking>
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Tablero de lavado";
+    ViewData["ActiveSection"] = "admin/operaciones";
+    var cols = new[] { "Confirmada", "Ingresado", "En lavado", "En secado", "Listo para recoger" };
+}
+<h2>Tablero de lavado</h2>
+<div class="board">
+  @foreach (var st in cols)
+  {
+    var items = Model.Where(b => b.Status == st).ToList();
+    <div class="col">
+      <b>@st</b>
+      @if (items.Any())
+      {
+        @foreach (var b in items)
+        {
+          <div class="card l">
+            <a href="/admin/reservas/@b.Id"><b>@b.BookingCode</b></a> @b.TimeSlot<br />
+            @b.VehicleBrand @b.VehicleModel · @b.ServiceName
+            <form asp-controller="Admin" asp-action="AdvanceFromBoard" asp-route-id="@b.Id" method="post" style="margin-top:8px">
+              @Html.AntiForgeryToken()
+              <button type="submit" class="btn sm">@(st == "Listo para recoger" ? "Entregar" : "Avanzar")</button>
+            </form>
+          </div>
+        }
+      }
+      else
+      {
+        <div class="empty">Sin vehículos</div>
+      }
+    </div>
+  }
+</div>

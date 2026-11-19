@@ -31,6 +31,98 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Account/AccessDenied.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9BY2Nlc3NEZW5pZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Account/ForgotPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Gb3Jnb3RQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Admin/BookingDetail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQm9va2luZ0RldGFpbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Admin/Bookings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQm9va2luZ3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Admin/Calendar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQ2FsZW5kYXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Admin/Clients.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQ2xpZW50cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Admin/Config.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vQ29uZmlnLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Admin/Operations.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vT3BlcmF0aW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Admin/Services.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vU2VydmljZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Booking/ConfirmStep.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZy9Db25maXJtU3RlcC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Booking/ScheduleStep.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZy9TY2hlZHVsZVN0ZXAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Booking/ServiceStep.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZy9TZXJ2aWNlU3RlcC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Booking/VehicleStep.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va2luZy9WZWhpY2xlU3RlcC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Client/BookingDetail.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2xpZW50L0Jvb2tpbmdEZXRhaWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Client/Bookings.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2xpZW50L0Jvb2tpbmdzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Client/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2xpZW50L0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Client/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2xpZW50L1Byb2ZpbGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Client/Vehicles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2xpZW50L1ZlaGljbGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Home/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9FcnJvci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Home/HowItWorks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Ib3dJdFdvcmtzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -39,12 +131,36 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Home/Services.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9TZXJ2aWNlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Shared/_BookingTracker.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Cb29raW5nVHJhY2tlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Shared/_LayoutApp.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXRBcHAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Shared/_LayoutPublic.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXRQdWJsaWMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Shared/_ServiceGrid.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19TZXJ2aWNlR3JpZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/workspaces/Carwash_Digital/CarWashDigital.Web/Views/Tracking/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvVHJhY2tpbmcvSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/workspaces/Carwash_Digital/CarWashDigital.Web/Views/_ViewImports.cshtml]

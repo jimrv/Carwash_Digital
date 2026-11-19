@@ -1,0 +1,45 @@
+@model ConfirmStepVm
+@{
+    ViewData["Title"] = "Resumen de tu reserva";
+    var steps = new[] { "Servicio", "Vehículo", "Fecha y hora", "Confirmación" };
+}
+<section class="s">
+  <div class="steps">
+    @for (var i = 0; i < steps.Length; i++)
+    {
+      <span class="@(i <= 3 ? "on" : "")">@steps[i]</span>
+    }
+  </div>
+  <h2>Resumen de tu reserva</h2>
+
+  <div class="card" style="max-width:520px">
+    <h3>@Model.Service.Name</h3>
+    <ul>
+      @foreach (var inc in Model.Service.Includes)
+      {
+        <li>@inc</li>
+      }
+    </ul>
+    <p>
+      Vehículo: @Model.Vehicle.Brand @Model.Vehicle.Model (@Model.Vehicle.Category)<br />
+      Fecha: @Model.Date.ToString("dd/MM/yyyy") a las @Model.TimeSlot<br />
+      Contacto: @Model.Customer.Name · @Model.Customer.Phone
+    </p>
+    <div class="pr">S/ @Model.Price</div>
+    <small>Precio de demostración. Pago en el local; no se solicitan datos bancarios.</small>
+    <p></p>
+
+    <form asp-controller="Booking" asp-action="Confirm" method="post">
+      @Html.AntiForgeryToken()
+      <input type="hidden" name="ServiceId" value="@Model.Service.Id" />
+      <input type="hidden" name="VehicleId" value="@Model.Vehicle.Id" />
+      <input type="hidden" name="Date" value="@Model.Date.ToString("yyyy-MM-dd")" />
+      <input type="hidden" name="TimeSlot" value="@Model.TimeSlot" />
+      @if (Model.RescheduleId.HasValue)
+      {
+        <input type="hidden" name="RescheduleId" value="@Model.RescheduleId.Value" />
+      }
+      <button type="submit" class="btn">@(Model.RescheduleId.HasValue ? "Confirmar nuevo horario" : "Confirmar reserva")</button>
+    </form>
+  </div>
+</section>

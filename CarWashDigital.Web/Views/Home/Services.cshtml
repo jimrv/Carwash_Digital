@@ -1,0 +1,6 @@
+@model IEnumerable<ServiceItem>
+@{ ViewData["Title"] = "Servicios y precios"; }
+<section class="s">
+  <h2>Servicios y precios</h2>
+  @await Html.PartialAsync("_ServiceGrid", Model)
+</section>

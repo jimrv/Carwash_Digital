@@ -1,0 +1,47 @@
+@model AdminCalendarVm
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Calendario operativo";
+    ViewData["ActiveSection"] = "admin/calendario";
+}
+<h2>Calendario operativo</h2>
+<form method="get" action="/admin/calendario">
+  <input type="date" name="date" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" onchange="this.form.submit()" style="max-width:220px" />
+</form>
+<p></p>
+
+@if (Model.Rows.Any())
+{
+  <div class="tw">
+    <table>
+      <tr><th>Hora</th><th>Ocupación</th><th>Reservas</th></tr>
+      @foreach (var r in Model.Rows)
+      {
+        <tr>
+          <td>@r.TimeSlot</td>
+          <td>
+            @r.Used/@Model.CapacityPerSlot
+            @if (r.Free < 1) { <span class="pill er">Completo</span> }
+          </td>
+          <td>
+            @if (r.Bookings.Any())
+            {
+              @foreach (var b in r.Bookings)
+              {
+                <a href="/admin/reservas/@b.Id" style="margin-right:8px">@b.BookingCode @b.VehiclePlate</a>
+              }
+            }
+            else
+            {
+              <text>—</text>
+            }
+          </td>
+        </tr>
+      }
+    </table>
+  </div>
+}
+else
+{
+  <div class="empty">Día no laborable o fecha pasada.</div>
+}

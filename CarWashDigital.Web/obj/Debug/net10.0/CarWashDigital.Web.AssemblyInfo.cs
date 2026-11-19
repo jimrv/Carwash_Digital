@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CarWashDigital.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4d70c7d61fc8a342e89076a93e8676419dab4389")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d97bc4e2c31683241211c8ad896c8d42f9d652ed")]
 [assembly: System.Reflection.AssemblyProductAttribute("CarWashDigital.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CarWashDigital.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

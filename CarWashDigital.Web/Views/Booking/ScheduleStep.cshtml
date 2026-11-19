@@ -1,0 +1,53 @@
+@model ScheduleStepVm
+@{
+    ViewData["Title"] = "Fecha y horario";
+    var steps = new[] { "Servicio", "Vehículo", "Fecha y hora", "Confirmación" };
+    var minDate = DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd");
+    var selIso = Model.SelectedDate.ToString("yyyy-MM-dd");
+}
+<section class="s">
+  <div class="steps">
+    @for (var i = 0; i < steps.Length; i++)
+    {
+      <span class="@(i <= 2 ? "on" : "")">@steps[i]</span>
+    }
+  </div>
+  <h2>Fecha y horario</h2>
+
+  <form method="get" action="/reservar/horario">
+    <input type="hidden" name="serviceId" value="@Model.Service.Id" />
+    <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
+    @if (Model.RescheduleId.HasValue)
+    {
+      <input type="hidden" name="rescheduleId" value="@Model.RescheduleId.Value" />
+    }
+    <label for="dt">Fecha</label>
+    <input id="dt" name="date" type="date" min="@minDate" value="@selIso" onchange="this.form.submit()" style="max-width:220px" />
+  </form>
+
+  <p></p>
+
+  @if (Model.Slots.Any())
+  {
+    <div class="slots">
+      @foreach (var s in Model.Slots)
+      {
+        var disabled = s.FreeCapacity < 1 || s.IsPast;
+        var label = s.IsPast ? "Pasado" : (s.FreeCapacity < 1 ? "Sin cupo" : $"{s.FreeCapacity} cupo(s)");
+        var url = $"/reservar/confirmacion?serviceId={Model.Service.Id}&vehicleId={Model.Vehicle.Id}&date={selIso}&timeSlot={Uri.EscapeDataString(s.Time)}" + (Model.RescheduleId.HasValue ? $"&rescheduleId={Model.RescheduleId.Value}" : "");
+        if (disabled)
+        {
+          <button type="button" class="slot" disabled>@s.Time<br /><small>@label</small></button>
+        }
+        else
+        {
+          <a class="slot" href="@url">@s.Time<br /><small>@label</small></a>
+        }
+      }
+    </div>
+  }
+  else
+  {
+    <div class="empty">No hay horarios disponibles ese día. Prueba con otra fecha.</div>
+  }
+</section>

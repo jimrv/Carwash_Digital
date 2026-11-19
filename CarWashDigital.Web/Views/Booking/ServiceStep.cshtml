@@ -1,0 +1,15 @@
+@model IEnumerable<ServiceItem>
+@{
+    ViewData["Title"] = "Elige tu servicio";
+    var steps = new[] { "Servicio", "Vehículo", "Fecha y hora", "Confirmación" };
+}
+<section class="s">
+  <div class="steps">
+    @for (var i = 0; i < steps.Length; i++)
+    {
+      <span class="@(i <= 0 ? "on" : "")">@steps[i]</span>
+    }
+  </div>
+  <h2>Elige tu servicio</h2>
+  @await Html.PartialAsync("_ServiceGrid", Model)
+</section>

@@ -1,0 +1,78 @@
+@{
+    var isAdmin = User.IsInRole("Admin");
+    var activeSection = ViewData["ActiveSection"]?.ToString() ?? "";
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#16B9F2" />
+  <title>@(ViewData["Title"] ?? "Car Wash Digital")</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="side">
+      <img src="/images/logo.jpg" alt="Car Wash Digital" />
+      <button type="button" class="btn ghost-dark sm" style="margin-bottom:8px" data-theme-toggle aria-pressed="false">🌙 Oscuro</button>
+      @if (isAdmin)
+      {
+        <a href="/admin" class="@(activeSection == "admin" ? "on" : "")">Panel</a>
+        <a href="/admin/reservas" class="@(activeSection == "admin/reservas" ? "on" : "")">Reservas</a>
+        <a href="/admin/calendario" class="@(activeSection == "admin/calendario" ? "on" : "")">Calendario</a>
+        <a href="/admin/operaciones" class="@(activeSection == "admin/operaciones" ? "on" : "")">Operaciones</a>
+        <a href="/admin/servicios" class="@(activeSection == "admin/servicios" ? "on" : "")">Servicios y tarifas</a>
+        <a href="/admin/clientes" class="@(activeSection == "admin/clientes" ? "on" : "")">Clientes</a>
+        <a href="/admin/config" class="@(activeSection == "admin/config" ? "on" : "")">Configuración</a>
+      }
+      else
+      {
+        <a href="/cliente" class="@(activeSection == "cliente" ? "on" : "")">Inicio</a>
+        <a href="/cliente/reservas" class="@(activeSection == "cliente/reservas" ? "on" : "")">Mis reservas</a>
+        <a href="/cliente/vehiculos" class="@(activeSection == "cliente/vehiculos" ? "on" : "")">Mis vehículos</a>
+        <a href="/cliente/perfil" class="@(activeSection == "cliente/perfil" ? "on" : "")">Perfil</a>
+        <a href="/reservar/servicio" class="@(activeSection == "reservar" ? "on" : "")">Reservar</a>
+      }
+      <a href="/">Sitio público</a>
+      <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="nav-btn">Cerrar sesión</button>
+      </form>
+    </aside>
+
+    <main class="main">
+      @if (TempData["Success"] != null)
+      {
+        <div class="alert">@TempData["Success"]</div>
+      }
+      @if (TempData["Error"] != null)
+      {
+        <div class="alert er">@TempData["Error"]</div>
+      }
+      @RenderBody()
+    </main>
+  </div>
+
+  <nav class="mobile-bar" aria-label="Navegación app móvil">
+    @if (isAdmin)
+    {
+      <a href="/admin" class="@(activeSection == "admin" ? "on" : "")">📊<span>Panel</span></a>
+      <a href="/admin/operaciones" class="@(activeSection == "admin/operaciones" ? "on" : "")">🧼<span>Tablero</span></a>
+      <a href="/admin/calendario" class="@(activeSection == "admin/calendario" ? "on" : "")">📅<span>Agenda</span></a>
+      <a href="/admin/reservas" class="@(activeSection == "admin/reservas" ? "on" : "")">📋<span>Reservas</span></a>
+    }
+    else
+    {
+      <a href="/cliente" class="@(activeSection == "cliente" ? "on" : "")">🏠<span>Inicio</span></a>
+      <a href="/reservar/servicio" class="@(activeSection == "reservar" ? "on" : "")">📅<span>Reservar</span></a>
+      <a href="/cliente/reservas" class="@(activeSection == "cliente/reservas" ? "on" : "")">📋<span>Reservas</span></a>
+      <a href="/cliente/vehiculos" class="@(activeSection == "cliente/vehiculos" ? "on" : "")">🚗<span>Vehículos</span></a>
+    }
+  </nav>
+
+  <script src="/js/theme.js"></script>
+</body>
+</html>

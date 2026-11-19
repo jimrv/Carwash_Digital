@@ -1,0 +1,49 @@
+@model ClientDashboardVm
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Mi cuenta";
+    ViewData["ActiveSection"] = "cliente";
+    var firstName = Model.User.Name.Split(' ')[0];
+}
+<h2>Hola, @firstName</h2>
+<a class="btn" href="/reservar/servicio">Reservar lavado</a>
+
+<h3 style="margin-top:24px">Tu próxima reserva</h3>
+@if (Model.NextBooking != null)
+{
+  <div class="card" style="max-width:640px">
+    <b>@Model.NextBooking.ServiceName</b> · @Model.NextBooking.Date.ToString("dd/MM/yyyy") @Model.NextBooking.TimeSlot
+    @await Html.PartialAsync("_BookingTracker", Model.NextBooking)
+    <p><a href="/cliente/reservas/@Model.NextBooking.Id">Ver detalle</a></p>
+  </div>
+}
+else
+{
+  <div class="empty">No tienes reservas próximas.<p><a class="btn" href="/reservar/servicio">Reservar lavado</a></p></div>
+}
+
+<h3>Historial</h3>
+@if (Model.CompletedBookings.Any())
+{
+  <div class="tw">
+    <table>
+      <tr><th>Código</th><th>Fecha</th><th>Servicio</th><th>Vehículo</th><th>Precio</th><th>Estado</th><th></th></tr>
+      @foreach (var b in Model.CompletedBookings)
+      {
+        <tr>
+          <td>@b.BookingCode</td>
+          <td>@b.Date.ToString("dd/MM/yyyy") @b.TimeSlot</td>
+          <td>@b.ServiceName</td>
+          <td>@b.VehicleBrand @b.VehiclePlate</td>
+          <td>S/ @b.Price</td>
+          <td><span class="pill ok">@b.Status</span></td>
+          <td><a href="/cliente/reservas/@b.Id">Ver</a></td>
+        </tr>
+      }
+    </table>
+  </div>
+}
+else
+{
+  <div class="empty">No hay reservas completadas para mostrar.</div>
+}

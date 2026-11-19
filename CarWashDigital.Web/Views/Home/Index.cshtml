@@ -1,8 +1,54 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model IEnumerable<ServiceItem>
+@{
+    ViewData["Title"] = "Car Wash Digital";
+    var steps = new[] {
+        "Selecciona el servicio",
+        "Registra tu vehículo",
+        "Reserva fecha y horario",
+        "Consulta el estado y recoge tu vehículo"
+    };
 }
+<section class="hero">
+  <div class="in">
+    <div>
+      <h1>Tu auto limpio, sin perder tiempo en colas.</h1>
+      <p>Reserva tu horario, conoce el precio antes de llegar y sigue el estado de tu vehículo desde una sola plataforma.</p>
+      <a class="btn" href="/reservar/servicio">Reservar mi lavado</a>
+      <a class="btn ghost-dark" href="/servicios">Ver servicios y precios</a>
+    </div>
+    <img src="/images/logo.jpg" alt="Logo Car Wash Digital" />
+  </div>
+</section>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="s">
+  <div class="grid">
+    <div class="card l"><h3>Reserva programada</h3><p>Elige una fecha y un horario disponible.</p></div>
+    <div class="card l"><h3>Precios transparentes</h3><p>Consulta las tarifas antes de confirmar.</p></div>
+    <div class="card l"><h3>Seguimiento digital</h3><p>Conoce el estado de tu vehículo durante el servicio.</p></div>
+  </div>
+</section>
+
+<section class="s dark" style="max-width:none">
+  <div style="max-width:1150px;margin:auto">
+    <h2>Cómo funciona</h2>
+    <div class="grid">
+      @for (var i = 0; i < steps.Length; i++)
+      {
+        <div><b style="color:var(--b)">Paso @(i + 1)</b><p>@steps[i]</p></div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="s">
+  <h2>Servicios destacados</h2>
+  @await Html.PartialAsync("_ServiceGrid", Model)
+</section>
+
+<section class="s">
+  <div class="card">
+    <h3>Sabrás cuánto pagas antes de confirmar</h3>
+    <p>El precio y los tratamientos incluidos se muestran en el resumen de tu reserva y quedan registrados al confirmar.</p>
+    <a class="btn" href="/reservar/servicio">Reservar mi próximo lavado</a>
+  </div>
+</section>

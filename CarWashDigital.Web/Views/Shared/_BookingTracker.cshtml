@@ -1,0 +1,33 @@
+@model Booking
+@{
+    var stages = new[] { "Confirmada", "Ingresado", "En lavado", "En secado", "Listo para recoger" };
+    var idx = Array.IndexOf(stages, Model.Status);
+    var ing = Model.History.FirstOrDefault(h => h.Status == "Ingresado");
+    var last = Model.History.OrderBy(h => h.ChangedAt).LastOrDefault();
+}
+@if (Model.Status == "Cancelada")
+{
+  <span class="pill er">Cancelada</span>
+}
+else
+{
+  <div class="tr">
+    @for (var k = 0; k < stages.Length; k++)
+    {
+      var st = stages[k];
+      var cls = (idx >= 0 && k < idx) || Model.Status == "Entregada" ? "done" : (k == idx ? "cur" : "");
+      <div class="@cls">@st</div>
+    }
+  </div>
+  @if (last != null)
+  {
+    <small>
+      Última actualización: @last.ChangedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+      @if (ing != null && idx >= 0 && idx < 4)
+      {
+        var est = ing.ChangedAt.AddMinutes(Model.DurationMinutes).ToLocalTime().ToString("HH:mm");
+        <text> · Finalización estimada (referencial): @est</text>
+      }
+    </small>
+  }
+}

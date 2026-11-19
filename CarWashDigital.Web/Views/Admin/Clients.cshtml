@@ -1,0 +1,31 @@
+@model IEnumerable<AdminClientRowVm>
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Clientes";
+    ViewData["ActiveSection"] = "admin/clientes";
+}
+<h2>Clientes</h2>
+@if (Model.Any())
+{
+  <div class="tw">
+    <table>
+      <tr><th>Nombre</th><th>Tipo / Empresa</th><th>Correo</th><th>Celular</th><th>Vehículos</th><th>Completadas</th><th>Canceladas</th></tr>
+      @foreach (var u in Model)
+      {
+        <tr>
+          <td>@u.Name</td>
+          <td>@(u.AccountType == "Fleet" ? $"Flota ({u.CompanyName})" : "Particular")</td>
+          <td>@u.Email</td>
+          <td>@u.Phone</td>
+          <td>@u.VehiclesCount</td>
+          <td>@u.CompletedCount</td>
+          <td>@u.CancelledCount</td>
+        </tr>
+      }
+    </table>
+  </div>
+}
+else
+{
+  <div class="empty">Sin clientes registrados.</div>
+}

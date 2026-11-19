@@ -1,24 +1,31 @@
-using System.Diagnostics;
+using CarWashDigital.Web.Data;
 using Microsoft.AspNetCore.Mvc;
-using CarWashDigital.Web.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarWashDigital.Web.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    private readonly CarWashDbContext _db;
+    public HomeController(CarWashDbContext db) => _db = db;
+
+    [HttpGet("/")]
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var services = await _db.Services.Where(s => s.IsActive).OrderBy(s => s.Code).ToListAsync();
+        return View(services);
     }
 
-    public IActionResult Privacy()
+    [HttpGet("/servicios")]
+    public async Task<IActionResult> Services()
     {
-        return View();
+        var services = await _db.Services.Where(s => s.IsActive).OrderBy(s => s.Code).ToListAsync();
+        return View(services);
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
+    [HttpGet("/como-funciona")]
+    public IActionResult HowItWorks() => View();
+
+    [HttpGet("/Home/Error")]
+    public IActionResult Error() => View();
 }

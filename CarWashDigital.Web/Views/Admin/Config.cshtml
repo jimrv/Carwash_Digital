@@ -1,0 +1,38 @@
+@model BusinessConfig
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Horarios y capacidad";
+    ViewData["ActiveSection"] = "admin/config";
+    var dayNames = new[] { "Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb" };
+}
+<h2>Horarios y capacidad</h2>
+<form class="card" style="max-width:520px" asp-controller="Admin" asp-action="SaveConfig" method="post">
+  @Html.AntiForgeryToken()
+
+  <label for="co">Apertura (hora)</label>
+  <input id="co" name="openHour" type="number" min="0" max="23" value="@Model.OpenHour" required />
+
+  <label for="cc">Cierre (hora)</label>
+  <input id="cc" name="closeHour" type="number" min="1" max="24" value="@Model.CloseHour" required />
+
+  <label for="cp">Bahías / cupos por bloque</label>
+  <input id="cp" name="capacityPerSlot" type="number" min="1" value="@Model.CapacityPerSlot" required />
+
+  <label>Días de atención</label>
+  <p>
+    @for (var i = 0; i < dayNames.Length; i++)
+    {
+      var checkedDay = Model.OpenDays.Contains(i);
+      <label style="display:inline-block;margin-right:10px">
+        <input type="checkbox" name="openDays" value="@i" checked="@checkedDay" style="width:auto;min-height:0" /> @dayNames[i]
+      </label>
+    }
+  </p>
+
+  <label for="cx">Fechas no disponibles (AAAA-MM-DD, separadas por coma)</label>
+  <input id="cx" name="closedDatesText" value="@string.Join(", ", Model.ClosedDates)" />
+
+  <p></p>
+  <button type="submit" class="btn">Guardar configuración</button>
+  <p><small>Los cambios no cancelan reservas ya confirmadas.</small></p>
+</form>

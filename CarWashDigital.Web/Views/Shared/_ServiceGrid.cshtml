@@ -1,0 +1,28 @@
+@model IEnumerable<ServiceItem>
+@{
+    var cats = new[] { "Sedán", "SUV", "Pick-up 4x4" };
+}
+<div class="grid">
+  @foreach (var s in Model)
+  {
+    <div class="card l">
+      <h3>@s.Name</h3>
+      <p>@s.Description</p>
+      <ul>
+        @foreach (var inc in s.Includes)
+        {
+          <li>@inc</li>
+        }
+      </ul>
+      <small>@s.DurationMinutes min aprox.</small>
+      @foreach (var c in cats)
+      {
+        if (s.PricesByCategory.TryGetValue(c, out var pr))
+        {
+          <div>@c: <span class="pr">S/ @pr</span></div>
+        }
+      }
+      <p><a class="btn" href="/reservar/vehiculo?serviceId=@s.Id">Reservar</a></p>
+    </div>
+  }
+</div>

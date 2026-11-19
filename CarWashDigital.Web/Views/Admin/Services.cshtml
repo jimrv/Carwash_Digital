@@ -1,0 +1,47 @@
+@model IEnumerable<ServiceItem>
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Servicios y tarifas";
+    ViewData["ActiveSection"] = "admin/servicios";
+}
+<h2>Servicios y tarifas</h2>
+
+@foreach (var s in Model)
+{
+  s.PricesByCategory.TryGetValue("Sedán", out var pSedan);
+  s.PricesByCategory.TryGetValue("SUV", out var pSuv);
+  s.PricesByCategory.TryGetValue("Pick-up 4x4", out var pPickup);
+
+  <div class="card l" style="margin-bottom:12px">
+    <h3>
+      @s.Name
+      @if (!s.IsActive) { <span class="pill er">Inactivo</span> }
+    </h3>
+    <form asp-controller="Admin" asp-action="SaveService" method="post">
+      @Html.AntiForgeryToken()
+      <input type="hidden" name="id" value="@s.Id" />
+      <div class="grid">
+        <div><label>Nombre</label><input name="name" value="@s.Name" required /></div>
+        <div><label>Descripción</label><input name="description" value="@s.Description" required /></div>
+        <div><label>Tratamientos (separados por coma)</label><input name="includesText" value="@string.Join(", ", s.Includes)" /></div>
+        <div><label>Minutos</label><input name="durationMinutes" type="number" min="10" value="@s.DurationMinutes" required /></div>
+        <div><label>Precio Sedán (S/)</label><input name="sedanPrice" type="number" step="0.5" min="0" value="@(s.PricesByCategory.ContainsKey("Sedán") ? pSedan.ToString(System.Globalization.CultureInfo.InvariantCulture) : "")" /></div>
+        <div><label>Precio SUV (S/)</label><input name="suvPrice" type="number" step="0.5" min="0" value="@(s.PricesByCategory.ContainsKey("SUV") ? pSuv.ToString(System.Globalization.CultureInfo.InvariantCulture) : "")" /></div>
+        <div><label>Precio Pick-up 4x4 (S/)</label><input name="pickupPrice" type="number" step="0.5" min="0" value="@(s.PricesByCategory.ContainsKey("Pick-up 4x4") ? pPickup.ToString(System.Globalization.CultureInfo.InvariantCulture) : "")" /></div>
+      </div>
+      <p style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <button type="submit" class="btn sm">Guardar</button>
+      </p>
+    </form>
+    <form asp-controller="Admin" asp-action="ToggleService" asp-route-id="@s.Id" method="post">
+      @Html.AntiForgeryToken()
+      <button type="submit" class="btn s sm">@(s.IsActive ? "Desactivar" : "Activar")</button>
+    </form>
+  </div>
+}
+
+<form asp-controller="Admin" asp-action="AddService" method="post">
+  @Html.AntiForgeryToken()
+  <button type="submit" class="btn s">Agregar servicio</button>
+</form>
+<p><small>Los cambios no alteran precios de reservas ya confirmadas.</small></p>

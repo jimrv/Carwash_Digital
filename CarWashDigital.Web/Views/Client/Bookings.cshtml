@@ -1,0 +1,41 @@
+@model IEnumerable<Booking>
+@{
+    Layout = "_LayoutApp";
+    ViewData["Title"] = "Mis reservas";
+    ViewData["ActiveSection"] = "cliente/reservas";
+    var filter = ViewBag.Filter?.ToString() ?? "prox";
+}
+<h2>Mis reservas</h2>
+<p>
+  <select onchange="location.href='/cliente/reservas?filter=' + this.value" style="max-width:220px">
+    <option value="prox" selected="@(filter == "prox")">Próximas</option>
+    <option value="comp" selected="@(filter == "comp")">Completadas</option>
+    <option value="canc" selected="@(filter == "canc")">Canceladas</option>
+  </select>
+</p>
+
+@if (Model.Any())
+{
+  <div class="tw">
+    <table>
+      <tr><th>Código</th><th>Fecha</th><th>Servicio</th><th>Vehículo</th><th>Precio</th><th>Estado</th><th></th></tr>
+      @foreach (var b in Model)
+      {
+        var pillCls = b.Status == "Cancelada" ? "er" : (b.Status == "Listo para recoger" || b.Status == "Entregada" ? "ok" : (b.Status == "Confirmada" ? "" : "wa"));
+        <tr>
+          <td>@b.BookingCode</td>
+          <td>@b.Date.ToString("dd/MM/yyyy") @b.TimeSlot</td>
+          <td>@b.ServiceName</td>
+          <td>@b.VehicleBrand @b.VehiclePlate</td>
+          <td>S/ @b.Price</td>
+          <td><span class="pill @pillCls">@b.Status</span></td>
+          <td><a href="/cliente/reservas/@b.Id">Ver</a></td>
+        </tr>
+      }
+    </table>
+  </div>
+}
+else
+{
+  <div class="empty">No hay reservas para mostrar.</div>
+}

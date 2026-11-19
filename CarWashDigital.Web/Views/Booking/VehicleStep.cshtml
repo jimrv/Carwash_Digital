@@ -1,0 +1,65 @@
+@model VehicleStepVm
+@{
+    ViewData["Title"] = "Tu vehículo";
+    var steps = new[] { "Servicio", "Vehículo", "Fecha y hora", "Confirmación" };
+    var cats = new[] { "Sedán", "SUV", "Pick-up 4x4" };
+}
+<section class="s">
+  <div class="steps">
+    @for (var i = 0; i < steps.Length; i++)
+    {
+      <span class="@(i <= 1 ? "on" : "")">@steps[i]</span>
+    }
+  </div>
+  <h2>Tu vehículo</h2>
+  @if (Model.RescheduleId.HasValue)
+  {
+    <p>Reprogramando: el vehículo no cambia.</p>
+  }
+
+  @if (Model.Vehicles.Any())
+  {
+    <form method="get" action="/reservar/horario">
+      <input type="hidden" name="serviceId" value="@Model.Service.Id" />
+      @if (Model.RescheduleId.HasValue)
+      {
+        <input type="hidden" name="rescheduleId" value="@Model.RescheduleId.Value" />
+      }
+      <label for="vs">Vehículos registrados</label>
+      <select id="vs" name="vehicleId">
+        @foreach (var v in Model.Vehicles)
+        {
+          var pr = Model.Service.PricesByCategory[v.Category];
+          <option value="@v.Id">@v.Brand @v.Model · @v.Category · S/ @pr</option>
+        }
+      </select>
+      <p></p>
+      <button type="submit" class="btn">Usar este vehículo</button>
+    </form>
+    <h3 style="margin-top:24px">O registra uno nuevo</h3>
+  }
+  else
+  {
+    <h3>Registra tu vehículo</h3>
+  }
+
+  <form asp-controller="Booking" asp-action="AddVehicle" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="ServiceId" value="@Model.Service.Id" />
+    <input type="hidden" name="ReturnToBooking" value="true" />
+    <div class="grid">
+      <div><label for="vb">Marca</label><input id="vb" name="Brand" required /></div>
+      <div><label for="vm">Modelo</label><input id="vm" name="Model" required /></div>
+      <div>
+        <label for="vc">Categoría</label>
+        <select id="vc" name="Category">
+          @foreach (var c in cats) { <option>@c</option> }
+        </select>
+      </div>
+      <div><label for="vp">Placa</label><input id="vp" name="Plate" required /></div>
+      <div><label for="vo">Color (opcional)</label><input id="vo" name="Color" /></div>
+    </div>
+    <p></p>
+    <button type="submit" class="btn">Guardar vehículo</button>
+  </form>
+</section>

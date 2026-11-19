@@ -157,6 +157,14 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Operations));
     }
 
+    [HttpGet("servicios/{id:guid}")]
+    public async Task<IActionResult> ServiceEdit(Guid id)
+    {
+        var svc = await _db.Services.FirstOrDefaultAsync(s => s.Id == id);
+        if (svc == null) return NotFound();
+        return View(svc);
+    }
+
     [HttpGet("servicios")]
     public async Task<IActionResult> Services()
     {
@@ -172,31 +180,33 @@ public class AdminController : Controller
 
         svc.Name = name.Trim();
         svc.Description = description.Trim();
-        svc.Includes = includesText.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
-        svc.DurationMinutes = Math.Max(10, durationMinutes);
+        svc.DurationMinutes = Math.Max(5, durationMinutes);
+        svc.Includes = includesText
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToList();
 
-        var prices = new Dictionary<string, decimal>();
-        if (sedanPrice.HasValue && sedanPrice.Value >= 0) prices["Sedán"] = sedanPrice.Value;
-        if (suvPrice.HasValue && suvPrice.Value >= 0) prices["SUV"] = suvPrice.Value;
-        if (pickupPrice.HasValue && pickupPrice.Value >= 0) prices["Pick-up 4x4"] = pickupPrice.Value;
-        svc.PricesByCategory = prices;
-
-        await _db.SaveChangesAsync();
-        TempData["Success"] = "Servicio guardado.";
-        return RedirectToAction(nameof(Services));
-    }
-
-    [HttpPost("servicios/{id:guid}/toggle"), ValidateAntiForgeryToken]
-    public async Task<IActionResult> ToggleService(Guid id)
-    {
-        var svc = await _db.Services.FirstOrDefaultAsync(s => s.Id == id);
-        if (svc != null)
+        var keys = svc.PricesByCategory.Keys.ToList();
+        if (keys.Count >= 3)
         {
-            svc.IsActive = !svc.IsActive;
-            await _db.SaveChangesAsync();
-            TempData["Success"] = svc.IsActive ? "Servicio activado." : "Servicio desactivado.";
+            if (sedanPrice.HasValue) svc.PricesByCategory[keys[0]] = sedanPrice.Value;
+            if (suvPrice.HasValue) svc.PricesByCategory[keys[1]] = suvPrice.Value;
+            if (pickupPrice.HasValue) svc.PricesByCategory[keys[2]] = pickupPrice.Value;
         }
-        return RedirectToAction(nameof(Services));
+        else
+        {
+            svc.PricesByCategory = new Dictionary<string, decimal>
+            {
+                ["Sedán"] = sedanPrice ?? 0m,
+                ["SUV"] = suvPrice ?? 0m,
+                ["Pick-up 4x4"] = pickupPrice ?? 0m
+            };
+        }
+
+        _db.Entry(svc).Property(x => x.Includes).IsModified = true;
+        _db.Entry(svc).Property(x => x.PricesByCategory).IsModified = true;
+        await _db.SaveChangesAsync();
+        TempData["Success"] = "Servicio actualizado correctamente.";
+        return RedirectToAction(nameof(ServiceEdit), new { id = svc.Id });
     }
 
     [HttpPost("servicios/agregar"), ValidateAntiForgeryToken]

@@ -50,6 +50,12 @@ public class BookingController : Controller
     [Authorize, HttpGet("vehiculo")]
     public async Task<IActionResult> VehicleStep(Guid serviceId, Guid? rescheduleId = null)
     {
+        if (User.IsInRole("Admin"))
+        {
+            TempData["Error"] = "La cuenta de administrador es exclusiva para gestión operativa y no puede solicitar reservas.";
+            return RedirectToAction("Index", "Admin");
+        }
+
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var service = await _db.Services.FirstOrDefaultAsync(s => s.Id == serviceId && s.IsActive);
         if (service == null)
@@ -111,6 +117,12 @@ public class BookingController : Controller
     [Authorize, HttpGet("horario")]
     public async Task<IActionResult> ScheduleStep(Guid serviceId, Guid vehicleId, DateOnly? date = null, Guid? rescheduleId = null)
     {
+        if (User.IsInRole("Admin"))
+        {
+            TempData["Error"] = "La cuenta de administrador es exclusiva para gestión operativa y no puede solicitar reservas.";
+            return RedirectToAction("Index", "Admin");
+        }
+
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var service = await _db.Services.FirstOrDefaultAsync(s => s.Id == serviceId);
         var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == vehicleId && v.UserId == userId && v.IsActive);
@@ -134,6 +146,12 @@ public class BookingController : Controller
     [Authorize, HttpGet("confirmacion")]
     public async Task<IActionResult> ConfirmStep(Guid serviceId, Guid vehicleId, DateOnly date, string timeSlot, Guid? rescheduleId = null)
     {
+        if (User.IsInRole("Admin"))
+        {
+            TempData["Error"] = "La cuenta de administrador es exclusiva para gestión operativa y no puede solicitar reservas.";
+            return RedirectToAction("Index", "Admin");
+        }
+
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var service = await _db.Services.FirstOrDefaultAsync(s => s.Id == serviceId);
         var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == vehicleId && v.UserId == userId && v.IsActive);
@@ -161,6 +179,12 @@ public class BookingController : Controller
     [Authorize, HttpPost("confirmar"), ValidateAntiForgeryToken]
     public async Task<IActionResult> Confirm(ConfirmBookingInput input)
     {
+        if (User.IsInRole("Admin"))
+        {
+            TempData["Error"] = "La cuenta de administrador es exclusiva para gestión operativa y no puede solicitar reservas.";
+            return RedirectToAction("Index", "Admin");
+        }
+
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var actorName = User.Identity?.Name ?? "Cliente";
 

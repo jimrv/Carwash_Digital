@@ -38,74 +38,99 @@ public class BookingService : IBookingService
 
     public async Task<BookingResult> CreateOrRescheduleAsync(Guid userId, ConfirmBookingInput input, string actorName)
     {
-        await using var tx = await _db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+        var service = await _db.Services.FirstOrDefaultAsync(s => s.Id == input.ServiceId && s.IsActive);
+        var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == input.VehicleId && v.UserId == userId && v.IsActive);
+        if (service == null || vehicle == null)
+            return new BookingResult(false, null, "Servicio o vehículo no válido.");
 
-        var free = await _slotService.GetFreeCapacityAsync(input.Date, input.TimeSlot, input.RescheduleId);
-        if (free < 1)
-            return new BookingResult(false, null, "Ese horario acaba de ocuparse o no está disponible. Elige otro.");
+        var catKey = CarWashDigital.Web.Controllers.BookingController.ResolveCategoryKey(service, vehicle.Category);
+        if (catKey == null || !service.PricesByCategory.TryGetValue(catKey, out var price))
+            return new BookingResult(false, null, "La categoría del vehículo no aplica para este servicio.");
 
-        if (input.RescheduleId.HasValue)
+        var slots = await _slotService.GetSlotsAsync(input.Date, input.RescheduleId);
+        var chosenSlot = slots.FirstOrDefault(s => s.Time == input.TimeSlot);
+        if (chosenSlot == null || chosenSlot.IsPast || chosenSlot.FreeCapacity <= 0)
+            return new BookingResult(false, null, "El horario seleccionado ya no tiene cupos disponibles.");
+
+        try
         {
-            var existing = await _db.Bookings.Include(b => b.History)
-                .FirstOrDefaultAsync(b => b.Id == input.RescheduleId.Value && b.UserId == userId);
-
-            if (existing == null || existing.Status != "Confirmada")
-                return new BookingResult(false, null, "No es posible reprogramar esta reserva.");
-
-            existing.Date = input.Date;
-            existing.TimeSlot = input.TimeSlot;
-            existing.History.Add(new BookingHistory
+            if (input.RescheduleId.HasValue)
             {
-                Status = "Reprogramada",
+                var existing = await _db.Bookings
+                    .FirstOrDefaultAsync(b => b.Id == input.RescheduleId.Value && b.UserId == userId);
+
+                if (existing == null)
+                    return new BookingResult(false, null, "No se encontró la reserva original para reprogramar.");
+
+                if (existing.Status != "Confirmada")
+                    return new BookingResult(false, null, "Solo se pueden reprogramar reservas en estado Confirmada.");
+
+                existing.ServiceId = service.Id;
+                existing.ServiceName = service.Name;
+                existing.ServiceIncludes = service.Includes.ToList();
+                existing.DurationMinutes = service.DurationMinutes;
+                existing.VehicleId = vehicle.Id;
+                existing.VehicleBrand = vehicle.Brand;
+                existing.VehicleModel = vehicle.Model;
+                existing.VehicleCategory = vehicle.Category;
+                existing.VehiclePlate = vehicle.Plate;
+                existing.Date = input.Date;
+                existing.TimeSlot = input.TimeSlot;
+                existing.Price = price;
+
+                _db.BookingHistories.Add(new BookingHistory
+                {
+                    BookingId = existing.Id,
+                    Status = $"Reprogramada ({input.Date:dd/MM/yyyy} {input.TimeSlot})",
+                    ChangedAt = DateTime.UtcNow,
+                    ChangedBy = actorName
+                });
+
+                await _db.SaveChangesAsync();
+                return new BookingResult(true, existing.Id, null);
+            }
+
+            var code = $"CW-{Random.Shared.Next(1000, 9999)}";
+            while (await _db.Bookings.AnyAsync(b => b.BookingCode == code))
+                code = $"CW-{Random.Shared.Next(1000, 9999)}";
+
+            var booking = new Booking
+            {
+                Id = Guid.NewGuid(),
+                BookingCode = code,
+                UserId = userId,
+                Date = input.Date,
+                TimeSlot = input.TimeSlot,
+                ServiceId = service.Id,
+                ServiceName = service.Name,
+                ServiceIncludes = service.Includes.ToList(),
+                DurationMinutes = service.DurationMinutes,
+                VehicleId = vehicle.Id,
+                VehicleBrand = vehicle.Brand,
+                VehicleModel = vehicle.Model,
+                VehicleCategory = vehicle.Category,
+                VehiclePlate = vehicle.Plate,
+                Price = price,
+                Status = "Confirmada",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _db.Bookings.Add(booking);
+            _db.BookingHistories.Add(new BookingHistory
+            {
+                BookingId = booking.Id,
+                Status = "Confirmada",
                 ChangedAt = DateTime.UtcNow,
                 ChangedBy = actorName
             });
 
             await _db.SaveChangesAsync();
-            await tx.CommitAsync();
-            return new BookingResult(true, existing.Id);
+            return new BookingResult(true, booking.Id, null);
         }
-
-        var service = await _db.Services.FirstOrDefaultAsync(s => s.Id == input.ServiceId && s.IsActive);
-        var vehicle = await _db.Vehicles.FirstOrDefaultAsync(v => v.Id == input.VehicleId && v.UserId == userId && v.IsActive);
-
-        if (service == null || vehicle == null)
-            return new BookingResult(false, null, "Servicio o vehículo inválido.");
-
-        var catKey = CarWashDigital.Web.Controllers.BookingController.ResolveCategoryKey(service, vehicle.Category);
-        if (catKey == null || !service.PricesByCategory.TryGetValue(catKey, out var price))
-            return new BookingResult(false, null, "No hay tarifa configurada para la categoría de tu vehículo.");
-
-        var code = await GenerateUniqueCodeAsync();
-        var booking = new Booking
+        catch (DbUpdateConcurrencyException)
         {
-            BookingCode = code,
-            UserId = userId,
-            Date = input.Date,
-            TimeSlot = input.TimeSlot,
-            ServiceId = service.Id,
-            ServiceName = service.Name,
-            ServiceIncludes = new List<string>(service.Includes),
-            DurationMinutes = service.DurationMinutes,
-            VehicleId = vehicle.Id,
-            VehicleBrand = vehicle.Brand,
-            VehicleModel = vehicle.Model,
-            VehicleCategory = vehicle.Category,
-            VehiclePlate = vehicle.Plate,
-            Price = price,
-            Status = "Confirmada",
-            CreatedAt = DateTime.UtcNow,
-            History = new List<BookingHistory>
-            {
-                new() { Status = "Confirmada", ChangedAt = DateTime.UtcNow, ChangedBy = actorName }
-            }
-        };
-
-        _db.Bookings.Add(booking);
-        await _db.SaveChangesAsync();
-        await tx.CommitAsync();
-
-        return new BookingResult(true, booking.Id);
+            return new BookingResult(false, null, "No se pudo guardar el cambio porque la reserva fue modificada recientemente. Recarga e inténtalo de nuevo.");
+        }
     }
 
     public async Task<bool> CancelAsync(Guid bookingId, Guid? restrictToUserId, string actorName)
@@ -132,22 +157,31 @@ public class BookingService : IBookingService
 
     public async Task<bool> AdvanceStatusAsync(Guid bookingId, string actorName)
     {
-        var booking = await _db.Bookings.Include(b => b.History).FirstOrDefaultAsync(b => b.Id == bookingId);
+        var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
         if (booking == null) return false;
 
         var next = GetNextStatus(booking.Status);
-        if (next == null) return false;
+        if (string.IsNullOrWhiteSpace(next)) return false;
 
-        booking.Status = next;
-        booking.History.Add(new BookingHistory
+        try
         {
-            Status = next,
-            ChangedAt = DateTime.UtcNow,
-            ChangedBy = actorName
-        });
+            booking.Status = next;
+            _db.BookingHistories.Add(new BookingHistory
+            {
+                Id = Guid.NewGuid(),
+                BookingId = booking.Id,
+                Status = next,
+                ChangedAt = DateTime.UtcNow,
+                ChangedBy = actorName
+            });
 
-        await _db.SaveChangesAsync();
-        return true;
+            await _db.SaveChangesAsync();
+            return true;
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return false;
+        }
     }
 
     private async Task<string> GenerateUniqueCodeAsync()

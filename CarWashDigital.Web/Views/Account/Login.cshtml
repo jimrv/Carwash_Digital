@@ -16,7 +16,14 @@
           <p class="text-secondary small mb-0">Accede para gestionar tus reservas, vehículos o turnos.</p>
         </div>
 
-        <form asp-controller="Account" asp-action="Login" method="post">
+        @if (!string.IsNullOrWhiteSpace(Context.Request.Query["ReturnUrl"]))
+{
+  <div class="alert alert-warning small mb-3" role="alert">
+    <b>Advertencia:</b> Necesitas iniciar sesión para reservar un servicio. Al ingresar, volverás automáticamente a tu reserva.
+  </div>
+}
+
+<form asp-controller="Account" asp-action="Login" method="post">
           @Html.AntiForgeryToken()
           <input type="hidden" asp-for="ReturnUrl" />
           <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>

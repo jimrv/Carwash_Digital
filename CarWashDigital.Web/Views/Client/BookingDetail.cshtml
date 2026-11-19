@@ -3,42 +3,97 @@
     Layout = "_LayoutApp";
     ViewData["Title"] = $"Reserva {Model.BookingCode}";
     ViewData["ActiveSection"] = "cliente/reservas";
-    var pillCls = Model.Status == "Cancelada" ? "er" : (Model.Status == "Listo para recoger" || Model.Status == "Entregada" ? "ok" : (Model.Status == "Confirmada" ? "" : "wa"));
     var canModify = Model.Status == "Confirmada";
 }
-<h2>Reserva @Model.BookingCode</h2>
-<div class="card" style="max-width:680px">
-  <p>
-    <b>@Model.ServiceName</b> <span class="pill @pillCls">@Model.Status</span><br />
-    Vehículo: @Model.VehicleBrand @Model.VehicleModel · @Model.VehicleCategory · <b>@Model.VehiclePlate</b><br />
-    Fecha: @Model.Date.ToString("dd/MM/yyyy") @Model.TimeSlot<br />
-    Precio confirmado: <span class="pr">S/ @Model.Price</span>
-  </p>
-  <ul>
-    @foreach (var inc in Model.ServiceIncludes) { <li>@inc</li> }
-  </ul>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <a href="/cliente/reservas" class="btn btn-link px-0 text-decoration-none small">← Volver a mis reservas</a>
+    <h1 class="h3 fw-extrabold mb-0">Reserva <span style="color:var(--blue)">@Model.BookingCode</span></h1>
+  </div>
+  <span class="badge @(Model.Status == "Cancelada" ? "text-bg-danger" : (Model.Status == "Listo para recoger" || Model.Status == "Entregada" ? "text-bg-success" : "text-bg-info")) fs-6">
+    @Model.Status
+  </span>
+</div>
 
-  @await Html.PartialAsync("_BookingTracker", Model)
+<div class="row g-4 align-items-start">
+  <div class="col-12 col-lg-8">
+    <div class="panel-card p-4 p-md-5">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 pb-3 mb-3 border-bottom">
+        <div>
+          <h2 class="h4 fw-bold mb-1">@Model.ServiceName</h2>
+          <p class="text-secondary small mb-0">
+            Vehículo: <b>@Model.VehicleBrand @Model.VehicleModel</b> · @Model.VehicleCategory · <b>@Model.VehiclePlate</b>
+          </p>
+        </div>
+        <div class="text-md-end">
+          <div class="small text-secondary">Precio confirmado</div>
+          <div class="price-tag fs-4">S/ @Model.Price.ToString("0.00")</div>
+        </div>
+      </div>
 
-  @if (canModify)
-  {
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
-      <form asp-controller="Client" asp-action="Reschedule" asp-route-id="@Model.Id" method="post">
-        @Html.AntiForgeryToken()
-        <button type="submit" class="btn s sm">Reprogramar</button>
-      </form>
-      <form asp-controller="Client" asp-action="Cancel" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('¿Cancelar esta reserva? Se liberará el cupo.')">
-        @Html.AntiForgeryToken()
-        <button type="submit" class="btn d sm">Cancelar reserva</button>
-      </form>
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6">
+          <div class="p-3 rounded-3 border" style="background:var(--sf2);border-color:var(--bd)!important">
+            <div class="small text-secondary">Fecha y bloque</div>
+            <div class="fw-bold">@Model.Date.ToString("dd/MM/yyyy") · @Model.TimeSlot</div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-6">
+          <div class="p-3 rounded-3 border" style="background:var(--sf2);border-color:var(--bd)!important">
+            <div class="small text-secondary">Registrada el</div>
+            <div class="fw-bold">@Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+          </div>
+        </div>
+      </div>
+
+      @if (Model.ServiceIncludes != null && Model.ServiceIncludes.Any())
+      {
+        <h3 class="h6 fw-bold mb-2">Tratamientos incluidos</h3>
+        <ul class="small mb-4">
+          @foreach (var inc in Model.ServiceIncludes)
+          {
+            <li>@inc</li>
+          }
+        </ul>
+      }
+
+      <h3 class="h6 fw-bold mb-2">Progreso del servicio</h3>
+      @await Html.PartialAsync("_BookingTracker", Model)
+
+      @if (canModify)
+      {
+        <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+          <a href="/reservar/horario?serviceId=@Model.ServiceId&vehicleId=@Model.VehicleId&rescheduleId=@Model.Id" class="btn btn-outline-info">
+            Reprogramar turno
+          </a>
+          <form asp-controller="Client" asp-action="CancelBooking" asp-route-id="@Model.Id" method="post" class="m-0" onsubmit="return confirm('¿Seguro que deseas cancelar esta reserva?');">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger">Cancelar reserva</button>
+          </form>
+        </div>
+      }
     </div>
-  }
+  </div>
 
-  <h3 style="margin-top:20px">Historial</h3>
-  <ul>
-    @foreach (var h in Model.History.OrderBy(x => x.ChangedAt))
-    {
-      <li>@h.Status · @h.ChangedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</li>
-    }
-  </ul>
+  <div class="col-12 col-lg-4">
+    <div class="panel-card p-4">
+      <h2 class="h6 fw-bold mb-3">Historial de estados</h2>
+      @if (Model.History != null && Model.History.Any())
+      {
+        <ul class="list-group list-group-flush">
+          @foreach (var h in Model.History.OrderByDescending(x => x.ChangedAt))
+          {
+            <li class="list-group-item px-0 d-flex justify-content-between align-items-center">
+              <span class="fw-semibold small">@h.Status</span>
+              <span class="small text-secondary">@h.ChangedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+            </li>
+          }
+        </ul>
+      }
+      else
+      {
+        <p class="text-secondary small mb-0">Sin movimientos adicionales registrados.</p>
+      }
+    </div>
+  </div>
 </div>

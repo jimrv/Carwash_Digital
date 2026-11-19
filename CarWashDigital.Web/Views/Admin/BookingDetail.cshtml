@@ -3,45 +3,73 @@
     Layout = "_LayoutApp";
     ViewData["Title"] = $"Reserva {Model.BookingCode}";
     ViewData["ActiveSection"] = "admin/reservas";
-    var nextStatus = ViewBag.NextStatus?.ToString();
-    var pillCls = Model.Status == "Cancelada" ? "er" : (Model.Status == "Listo para recoger" || Model.Status == "Entregada" ? "ok" : (Model.Status == "Confirmada" ? "" : "wa"));
+    var canAdvance = Model.Status != "Entregada" && Model.Status != "Cancelada";
 }
-<h2>Reserva @Model.BookingCode</h2>
-<div class="card" style="max-width:680px">
-  <p>
-    <b>@Model.ServiceName</b> <span class="pill @pillCls">@Model.Status</span><br />
-    Vehículo: @Model.VehicleBrand @Model.VehicleModel · @Model.VehicleCategory · @Model.VehiclePlate<br />
-    Fecha: @Model.Date.ToString("dd/MM/yyyy") @Model.TimeSlot<br />
-    Precio confirmado: <b>S/ @Model.Price</b><br />
-    Cliente: @(Model.User?.Name ?? "")
-  </p>
-  <ul>
-    @foreach (var inc in Model.ServiceIncludes) { <li>@inc</li> }
-  </ul>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <a href="/admin/reservas" class="btn btn-link px-0 text-decoration-none small">← Volver a reservas</a>
+    <h1 class="h3 fw-extrabold mb-0">Reserva <span style="color:var(--blue)">@Model.BookingCode</span></h1>
+  </div>
+  <span class="badge text-bg-info fs-6">@Model.Status</span>
+</div>
 
-  @await Html.PartialAsync("_BookingTracker", Model)
+<div class="row g-4 align-items-start">
+  <div class="col-12 col-lg-8">
+    <div class="panel-card p-4 p-md-5">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 pb-3 mb-3 border-bottom">
+        <div>
+          <h2 class="h4 fw-bold mb-1">@Model.ServiceName</h2>
+          <p class="text-secondary small mb-0">
+            Cliente: <b>@(Model.User?.Name ?? "—")</b> · Vehículo: <b>@Model.VehicleBrand @Model.VehicleModel (@Model.VehiclePlate)</b>
+          </p>
+        </div>
+        <div class="price-tag fs-4">S/ @Model.Price.ToString("0.00")</div>
+      </div>
 
-  <form asp-controller="Admin" asp-action="SaveNotes" asp-route-id="@Model.Id" method="post">
-    @Html.AntiForgeryToken()
-    <label for="ob">Observaciones internas</label>
-    <textarea id="ob" name="internalNotes">@Model.InternalNotes</textarea>
-    <p></p>
-    <button type="submit" class="btn s sm">Guardar observación</button>
-  </form>
+      <p class="small text-secondary mb-3">
+        Fecha programada: <b>@Model.Date.ToString("dd/MM/yyyy") · @Model.TimeSlot</b>
+      </p>
 
-  @if (!string.IsNullOrEmpty(nextStatus) && Model.Status != "Cancelada")
-  {
-    <form asp-controller="Admin" asp-action="AdvanceStatus" asp-route-id="@Model.Id" method="post" style="margin-top:12px">
-      @Html.AntiForgeryToken()
-      <button type="submit" class="btn sm">Avanzar a: @nextStatus</button>
-    </form>
-  }
+      @await Html.PartialAsync("_BookingTracker", Model)
 
-  <h3>Historial</h3>
-  <ul>
-    @foreach (var h in Model.History.OrderBy(x => x.ChangedAt))
-    {
-      <li>@h.Status · @h.ChangedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") · @h.ChangedBy</li>
-    }
-  </ul>
+      @if (canAdvance)
+      {
+        <form action="/admin/reservas/@Model.Id/avanzar" method="post" class="mt-4 pt-3 border-top">
+          @Html.AntiForgeryToken()
+          <button type="submit" class="btn btn-sky">Avanzar a siguiente etapa →</button>
+        </form>
+      }
+
+      <form action="/admin/reservas/@Model.Id/observacion" method="post" class="mt-4 pt-3 border-top">
+        @Html.AntiForgeryToken()
+        <label class="form-label fw-semibold small">Observaciones internas</label>
+        <div class="input-group">
+          <input name="internalNotes" value="@Model.InternalNotes" class="form-control" placeholder="Notas operativas para el equipo..." />
+          <button type="submit" class="btn btn-outline-info">Guardar nota</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="panel-card p-4">
+      <h2 class="h6 fw-bold mb-3">Historial</h2>
+      @if (Model.History != null && Model.History.Any())
+      {
+        <ul class="list-group list-group-flush">
+          @foreach (var h in Model.History.OrderByDescending(x => x.ChangedAt))
+          {
+            <li class="list-group-item px-0">
+              <div class="fw-semibold small">@h.Status</div>
+              <div class="small text-secondary">@h.ChangedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm") · @h.ChangedBy</div>
+            </li>
+          }
+        </ul>
+      }
+      else
+      {
+        <p class="text-secondary small mb-0">Sin historial registrado.</p>
+      }
+    </div>
+  </div>
 </div>

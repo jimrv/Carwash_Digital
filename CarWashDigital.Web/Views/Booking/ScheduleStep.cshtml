@@ -1,6 +1,8 @@
 @model ScheduleStepVm
 @{
     ViewData["Title"] = "Paso 3 · Elegir horario";
+    var hasAnySlots = Model.Slots != null && Model.Slots.Any();
+    var hasAvailableSlots = hasAnySlots && Model.Slots.Any(s => !s.IsPast && s.FreeCapacity > 0);
 }
 <section class="container py-4 py-md-5">
   <div class="mb-4">
@@ -21,30 +23,56 @@
         <label for="bDate" class="form-label fw-semibold">Fecha de atención</label>
         <input id="bDate" type="date" name="date" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" class="form-control" onchange="this.form.submit()" />
       </div>
+      <div class="col-12 col-sm-6 col-md-4">
+        <a href="/reservar/horario?serviceId=@Model.Service.Id&vehicleId=@Model.Vehicle.Id@(Model.RescheduleId.HasValue ? $"&rescheduleId={Model.RescheduleId.Value}" : "")"
+           class="btn btn-outline-info">
+          Ver disponibilidad de hoy
+        </a>
+      </div>
     </form>
 
-    <div class="row g-3">
-      @foreach (var slot in Model.Slots)
-      {
-        var isAvail = !slot.IsPast && slot.FreeCapacity > 0;
-        <div class="col-6 col-sm-4 col-md-3">
-          @if (isAvail)
-          {
-            var url = $"/reservar/confirmacion?serviceId={Model.Service.Id}&vehicleId={Model.Vehicle.Id}&date={Model.SelectedDate:yyyy-MM-dd}&timeSlot={Uri.EscapeDataString(slot.Time)}" + (Model.RescheduleId.HasValue ? $"&rescheduleId={Model.RescheduleId.Value}" : "");
-            <a href="@url" class="btn btn-outline-info w-100 py-3 d-flex flex-column align-items-center">
-              <span class="fw-bold">@slot.Time</span>
-              <span class="small">@slot.FreeCapacity cupo(s) libre(s)</span>
-            </a>
-          }
-          else
-          {
-            <button type="button" class="btn btn-secondary w-100 py-3 d-flex flex-column align-items-center" disabled>
-              <span class="fw-bold">@slot.Time</span>
-              <span class="small">@(slot.IsPast ? "Horario pasado" : "Sin cupo")</span>
-            </button>
-          }
+    @if (!hasAnySlots)
+    {
+      <div class="alert alert-warning mb-0" role="alert">
+        <div class="fw-bold mb-1">No se encuentran cupos disponibles para el @Model.SelectedDate.ToString("dd/MM/yyyy")</div>
+        <div class="small">
+          Por la anticipación de la fecha seleccionada o por tratarse de un día sin atención, todavía no hay bloques habilitados. Por favor selecciona una fecha más cercana en el calendario.
         </div>
-      }
-    </div>
+      </div>
+    }
+    else if (!hasAvailableSlots)
+    {
+      <div class="alert alert-info mb-3" role="alert">
+        <div class="fw-bold mb-1">Todos los cupos están ocupados o vencidos para esta fecha</div>
+        <div class="small">Por favor selecciona otro día disponible para continuar con tu reserva.</div>
+      </div>
+    }
+
+    @if (hasAnySlots)
+    {
+      <div class="row g-3">
+        @foreach (var slot in Model.Slots)
+        {
+          var isAvail = !slot.IsPast && slot.FreeCapacity > 0;
+          <div class="col-6 col-sm-4 col-md-3">
+            @if (isAvail)
+            {
+              var url = $"/reservar/confirmacion?serviceId={Model.Service.Id}&vehicleId={Model.Vehicle.Id}&date={Model.SelectedDate:yyyy-MM-dd}&timeSlot={Uri.EscapeDataString(slot.Time)}" + (Model.RescheduleId.HasValue ? $"&rescheduleId={Model.RescheduleId.Value}" : "");
+              <a href="@url" class="btn btn-outline-info w-100 py-3 d-flex flex-column align-items-center">
+                <span class="fw-bold">@slot.Time</span>
+                <span class="small">@slot.FreeCapacity cupo(s) libre(s)</span>
+              </a>
+            }
+            else
+            {
+              <button type="button" class="btn btn-secondary w-100 py-3 d-flex flex-column align-items-center" disabled>
+                <span class="fw-bold">@slot.Time</span>
+                <span class="small">@(slot.IsPast ? "Horario pasado" : "Sin cupo")</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
   </div>
 </section>

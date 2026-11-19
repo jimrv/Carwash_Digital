@@ -65,7 +65,7 @@
             <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#@modalId">
               Ver detalle
             </button>
-            <a class="btn btn-sky btn-sm flex-fill" href="/reservar/vehiculo?serviceId=@s.Id">
+            <a class="btn btn-sky btn-sm flex-fill" href="@(User.IsInRole("Admin") ? "/admin/servicios" : $"/reservar/vehiculo?serviceId={s.Id}")">
               Reservar
             </a>
           </div>
@@ -117,7 +117,7 @@
           </div>
           <div class="modal-footer">
             <a class="btn btn-outline-secondary btn-sm" href="/servicios/@s.Id">Ficha completa</a>
-            <a class="btn btn-sky btn-sm" href="/reservar/vehiculo?serviceId=@s.Id">Reservar ahora</a>
+            <a class="btn btn-sky btn-sm" href="@(User.IsInRole("Admin") ? "/admin/servicios" : $"/reservar/vehiculo?serviceId={s.Id}")">Reservar ahora</a>
           </div>
         </div>
       </div>

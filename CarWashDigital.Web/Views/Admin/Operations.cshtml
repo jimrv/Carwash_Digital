@@ -40,9 +40,8 @@
           <div class="fw-bold small">@b.TimeSlot · @b.VehiclePlate</div>
           <div class="small">@b.VehicleBrand @b.VehicleModel</div>
           <div class="small text-secondary mb-2">@b.ServiceName</div>
-          <form asp-controller="Admin" asp-action="AdvanceStatus" asp-route-id="@b.Id" method="post" class="m-0">
+          <form action="/admin/operaciones/@b.Id/avanzar" method="post" class="m-0">
             @Html.AntiForgeryToken()
-            <input type="hidden" name="nextStatus" value="@nextMap[st]" />
             <button type="submit" class="btn btn-sky btn-sm w-100">Mover a @nextMap[st]</button>
           </form>
         </div>

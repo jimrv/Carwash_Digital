@@ -51,7 +51,7 @@
           {
             <a class="btn btn-outline-light btn-sm px-3" href="/login">Iniciar sesión</a>
           }
-          <a class="btn btn-sky btn-sm px-3" href="/reservar/servicio">Reservar ahora</a>
+          <a class="btn btn-sky btn-sm px-3" href="@(User.IsInRole("Admin") ? "/admin" : "/reservar/servicio")">Reservar ahora</a>
         </div>
       </div>
     </div>
@@ -75,7 +75,7 @@
           <div class="fw-bold text-white small text-uppercase mb-2">Navegación</div>
           <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
             <li><a href="/servicios">Servicios individuales y flotas</a></li>
-            <li><a href="/reservar/servicio">Reservar turno en línea</a></li>
+            <li><a href="@(User.IsInRole("Admin") ? "/admin" : "/reservar/servicio")">Reservar turno en línea</a></li>
             <li><a href="/seguimiento">Seguimiento por código</a></li>
             <li><a href="/como-funciona">Cómo funciona</a></li>
           </ul>
@@ -96,7 +96,7 @@
   <nav class="mobile-bar" aria-label="Acceso rápido móvil">
     <a href="/">🏠<span>Inicio</span></a>
     <a href="/servicios">🧼<span>Servicios</span></a>
-    <a href="/reservar/servicio">📅<span>Reservar</span></a>
+    <a href="@(User.IsInRole("Admin") ? "/admin" : "/reservar/servicio")">📅<span>Reservar</span></a>
     <a href="/seguimiento">📍<span>Estado</span></a>
     <a href="@(User.Identity?.IsAuthenticated == true ? (User.IsInRole("Admin") ? "/admin" : "/cliente") : "/login")">👤<span>Cuenta</span></a>
   </nav>

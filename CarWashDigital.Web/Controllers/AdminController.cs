@@ -165,6 +165,71 @@ public class AdminController : Controller
         return View(svc);
     }
 
+    [HttpGet("servicios/nuevo")]
+    public IActionResult ServiceCreate()
+    {
+        var model = new ServiceItem
+        {
+            Id = Guid.NewGuid(),
+            Code = "s" + Random.Shared.Next(100, 999),
+            Name = "",
+            Description = "",
+            DurationMinutes = 45,
+            IsActive = true,
+            Includes = new List<string> { "Lavado exterior", "Secado con microfibra" },
+            PricesByCategory = new Dictionary<string, decimal>
+            {
+                ["Sedán"] = 30m,
+                ["SUV"] = 40m,
+                ["Pick-up 4x4"] = 50m
+            }
+        };
+        return View("ServiceEdit", model);
+    }
+
+    [HttpPost("servicios/crear"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateService(string name, string description, string includesText, int durationMinutes, bool isFleetService, decimal? sedanPrice, decimal? suvPrice, decimal? pickupPrice)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            TempData["Error"] = "El nombre del servicio es obligatorio.";
+            return RedirectToAction(nameof(ServiceCreate));
+        }
+
+        var prices = isFleetService
+            ? new Dictionary<string, decimal>
+            {
+                ["Flota Sedán / Taxi (x auto)"] = sedanPrice ?? 25m,
+                ["Flota SUV / Van (x auto)"] = suvPrice ?? 35m,
+                ["Flota Pick-up / Carga (x auto)"] = pickupPrice ?? 45m
+            }
+            : new Dictionary<string, decimal>
+            {
+                ["Sedán"] = sedanPrice ?? 30m,
+                ["SUV"] = suvPrice ?? 40m,
+                ["Pick-up 4x4"] = pickupPrice ?? 50m
+            };
+
+        var svc = new ServiceItem
+        {
+            Id = Guid.NewGuid(),
+            Code = (isFleetService ? "f" : "s") + Random.Shared.Next(100, 999),
+            Name = name.Trim(),
+            Description = (description ?? "").Trim(),
+            DurationMinutes = Math.Max(5, durationMinutes),
+            IsActive = true,
+            Includes = (includesText ?? "")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToList(),
+            PricesByCategory = prices
+        };
+
+        _db.Services.Add(svc);
+        await _db.SaveChangesAsync();
+        TempData["Success"] = "Servicio creado correctamente.";
+        return RedirectToAction(nameof(ServiceEdit), new { id = svc.Id });
+    }
+
     [HttpGet("servicios")]
     public async Task<IActionResult> Services()
     {
@@ -210,23 +275,7 @@ public class AdminController : Controller
     }
 
     [HttpPost("servicios/agregar"), ValidateAntiForgeryToken]
-    public async Task<IActionResult> AddService()
-    {
-        var code = "s" + Guid.NewGuid().ToString("N")[..6];
-        _db.Services.Add(new ServiceItem
-        {
-            Code = code,
-            Name = "Nuevo servicio",
-            Description = "Descripción",
-            Includes = new List<string> { "Lavado" },
-            DurationMinutes = 30,
-            IsActive = false,
-            PricesByCategory = new Dictionary<string, decimal>()
-        });
-        await _db.SaveChangesAsync();
-        TempData["Success"] = "Nuevo servicio creado en borrador.";
-        return RedirectToAction(nameof(Services));
-    }
+    public IActionResult AddService() => RedirectToAction(nameof(ServiceCreate));
 
     [HttpGet("clientes")]
     public async Task<IActionResult> Clients()
@@ -280,5 +329,26 @@ public class AdminController : Controller
         await _db.SaveChangesAsync();
         TempData["Success"] = "Configuración guardada.";
         return RedirectToAction(nameof(Config));
+    }
+
+    [HttpPost("servicios/{id:guid}/eliminar"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteService(Guid id)
+    {
+        var svc = await _db.Services.FirstOrDefaultAsync(s => s.Id == id);
+        if (svc == null) return NotFound();
+
+        var hasBookings = await _db.Bookings.AnyAsync(b => b.ServiceId == id);
+        if (hasBookings)
+        {
+            svc.IsActive = false;
+            await _db.SaveChangesAsync();
+            TempData["Success"] = "El servicio tiene reservas asociadas; se desactivó para proteger el historial.";
+            return RedirectToAction(nameof(Services));
+        }
+
+        _db.Services.Remove(svc);
+        await _db.SaveChangesAsync();
+        TempData["Success"] = "Servicio eliminado correctamente.";
+        return RedirectToAction(nameof(Services));
     }
 }

@@ -246,29 +246,9 @@ h1,h2,h3,h4,h5,.navbar-brand{
 .app-main{padding:28px;min-width:0}
 
 /* Tablas estilizadas y adaptables */
-.data-table-wrap{
-  background:var(--sf);
-  border:1px solid var(--bd);
-  border-radius:14px;
-  overflow-x:auto;
-  box-shadow:0 6px 18px rgba(2,132,199,.06);
-}
-.data-table{
-  margin:0;
-  width:100%;
-  border-collapse:collapse;
-}
-.data-table thead th{
-  background:var(--sf2);
-  color:var(--m);
-  font-size:.78rem;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:.05em;
-  padding:13px 16px;
-  border-bottom:1px solid var(--bd);
-  white-space:nowrap;
-}
+
+
+
 .data-table tbody td{
   padding:13px 16px;
   border-bottom:1px solid var(--bd);
@@ -433,4 +413,69 @@ main.public-main{
 }
 @media(max-width:768px){
   .board{grid-template-columns:1fr}
+}
+
+.data-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  border-radius: 14px;
+  border: 1px solid var(--bd, rgba(148, 163, 184, 0.25));
+  background: var(--sf, transparent);
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0;
+}
+
+/* Encabezados diferenciados, tipografía limpia y alineación en todas las tablas */
+.table-responsive.panel-card .table thead,
+.table-responsive.panel-card .table thead tr {
+  background-color: var(--sf2, #eef2f6);
+}
+.table-responsive.panel-card .table thead th,
+.table thead th {
+  background-color: var(--sf2, #eef2f6) !important;
+  color: var(--text, #0f172a) !important;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.9rem 1.15rem !important;
+  vertical-align: middle;
+  border-bottom: 2px solid var(--bd, rgba(148, 163, 184, 0.35)) !important;
+  white-space: nowrap;
+}
+.table-responsive.panel-card .table tbody td,
+.table tbody td {
+  padding: 0.9rem 1.15rem !important;
+  vertical-align: middle;
+}
+
+/* Encabezado diferenciado, tipografía y alineación en todas las tablas */
+table.table > thead,
+table.table > thead > tr {
+  background-color: var(--sf2, #e2e8f0) !important;
+}
+table.table > thead > tr > th,
+.data-table thead th,
+table thead th {
+  background-color: var(--sf2, #e2e8f0) !important;
+  color: var(--text, #0f172a) !important;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  padding: 0.9rem 1.15rem !important;
+  vertical-align: middle !important;
+  border-bottom: 2px solid var(--bd, rgba(100, 116, 139, 0.35)) !important;
+}
+table.table > tbody > tr > td,
+.data-table tbody td,
+table tbody td {
+  padding: 0.85rem 1.15rem !important;
+  vertical-align: middle !important;
 }

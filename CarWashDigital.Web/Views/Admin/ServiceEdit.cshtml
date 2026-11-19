@@ -1,36 +1,43 @@
 @model ServiceItem
 @{
     Layout = "_LayoutApp";
-    ViewData["Title"] = $"Gestionar · {Model.Name}";
+    var isNew = string.IsNullOrWhiteSpace(Model.Name);
+    ViewData["Title"] = isNew ? "Nuevo servicio" : $"Gestionar · {Model.Name}";
     ViewData["ActiveSection"] = "admin/servicios";
     var keys = Model.PricesByCategory.Keys.ToList();
-    var p0 = keys.Count > 0 ? Model.PricesByCategory[keys[0]] : 0m;
-    var p1 = keys.Count > 1 ? Model.PricesByCategory[keys[1]] : 0m;
-    var p2 = keys.Count > 2 ? Model.PricesByCategory[keys[2]] : 0m;
-    var l0 = keys.Count > 0 ? keys[0] : "Categoría 1";
-    var l1 = keys.Count > 1 ? keys[1] : "Categoría 2";
-    var l2 = keys.Count > 2 ? keys[2] : "Categoría 3";
+    var p0 = keys.Count > 0 ? Model.PricesByCategory[keys[0]] : 30m;
+    var p1 = keys.Count > 1 ? Model.PricesByCategory[keys[1]] : 40m;
+    var p2 = keys.Count > 2 ? Model.PricesByCategory[keys[2]] : 50m;
+    var l0 = keys.Count > 0 ? keys[0] : "Sedán";
+    var l1 = keys.Count > 1 ? keys[1] : "SUV";
+    var l2 = keys.Count > 2 ? keys[2] : "Pick-up 4x4";
 }
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
   <div>
     <a href="/admin/servicios" class="btn btn-link px-0 text-decoration-none small">← Volver a la tabla de servicios</a>
-    <h1 class="h3 fw-extrabold mb-0">@Model.Name</h1>
+    <h1 class="h3 fw-extrabold mb-0">@(isNew ? "Registrar nuevo servicio" : Model.Name)</h1>
   </div>
-  <span class="badge @(Model.IsActive ? "text-bg-success" : "text-bg-secondary") fs-6">
-    @(Model.IsActive ? "Servicio Activo" : "Servicio Desactivado")
-  </span>
+  @if (!isNew)
+  {
+    <span class="badge @(Model.IsActive ? "text-bg-success" : "text-bg-secondary") fs-6">
+      @(Model.IsActive ? "Servicio Activo" : "Servicio Desactivado")
+    </span>
+  }
 </div>
 
 <div class="row g-4">
   <div class="col-12 col-lg-8">
-    <form class="panel-card p-4 p-md-5" action="/admin/servicios/guardar" method="post">
+    <form class="panel-card p-4 p-md-5" action="@(isNew ? "/admin/servicios/crear" : "/admin/servicios/guardar")" method="post">
       @Html.AntiForgeryToken()
-      <input type="hidden" name="id" value="@Model.Id" />
+      @if (!isNew)
+      {
+        <input type="hidden" name="id" value="@Model.Id" />
+      }
 
       <div class="row g-3 mb-3">
         <div class="col-12 col-md-8">
           <label class="form-label fw-semibold">Nombre del servicio</label>
-          <input name="name" value="@Model.Name" class="form-control" required />
+          <input name="name" value="@Model.Name" class="form-control" placeholder="Ej. Lavado con Cera Cerámica" required />
         </div>
         <div class="col-12 col-md-4">
           <label class="form-label fw-semibold">Duración (minutos)</label>
@@ -38,14 +45,25 @@
         </div>
       </div>
 
+      @if (isNew)
+      {
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Tipo de servicio</label>
+          <select name="isFleetService" class="form-select">
+            <option value="false" selected="@(!Model.IsFleetService)">Individual</option>
+            <option value="true" selected="@(Model.IsFleetService)">Flota (+5 autos)</option>
+          </select>
+        </div>
+      }
+
       <div class="mb-3">
         <label class="form-label fw-semibold">Descripción</label>
-        <input name="description" value="@Model.Description" class="form-control" required />
+        <input name="description" value="@Model.Description" class="form-control" placeholder="Describe brevemente el servicio..." required />
       </div>
 
       <div class="mb-4">
         <label class="form-label fw-semibold">Tratamientos incluidos (separados por coma)</label>
-        <input name="includesText" value="@string.Join(", ", Model.Includes)" class="form-control" required />
+        <input name="includesText" value="@string.Join(", ", Model.Includes)" class="form-control" placeholder="Ej. Prelavado, Shampoo pH neutro, Aspirado" required />
       </div>
 
       <div class="row g-3 mb-4">
@@ -63,24 +81,31 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-sky px-4">Guardar cambios</button>
+      <button type="submit" class="btn btn-sky px-4">@(isNew ? "Crear servicio" : "Guardar cambios")</button>
     </form>
   </div>
 
-  <div class="col-12 col-lg-4">
-    <div class="panel-card p-4">
-      <h2 class="h6 fw-bold mb-2">Estado de disponibilidad</h2>
-      <p class="text-secondary small mb-3">
-        @(Model.IsActive
-          ? "Este servicio está visible para reservas. Si lo desactivas, dejará de ofrecerse en el flujo público."
-          : "Este servicio está oculto para nuevas reservas. Puedes volver a activarlo cuando lo necesites.")
-      </p>
-      <form action="/admin/servicios/@Model.Id/toggle" method="post">
+  @if (!isNew)
+  {
+    <div class="col-12 col-lg-4">
+      <div class="panel-card p-4">
+        <h2 class="h6 fw-bold mb-2">Estado de disponibilidad</h2>
+        <p class="text-secondary small mb-3">
+          @(Model.IsActive
+            ? "Este servicio está visible para reservas. Si lo desactivas, dejará de ofrecerse en el flujo público."
+            : "Este servicio está oculto para nuevas reservas. Puedes volver a activarlo cuando lo necesites.")
+        </p>
+        <form action="/admin/servicios/@Model.Id/toggle" method="post">
+          @Html.AntiForgeryToken()
+          <button type="submit" class="btn @(Model.IsActive ? "btn-outline-danger" : "btn-outline-success") w-100">
+            @(Model.IsActive ? "Desactivar servicio" : "Activar servicio")
+          </button>
+        </form>
+      <form action="/admin/servicios/@Model.Id/eliminar" method="post" class="mt-2" onsubmit="return confirm('¿Seguro que deseas eliminar este servicio?');">
         @Html.AntiForgeryToken()
-        <button type="submit" class="btn @(Model.IsActive ? "btn-outline-danger" : "btn-outline-success") w-100">
-          @(Model.IsActive ? "Desactivar servicio" : "Activar servicio")
-        </button>
+        <button type="submit" class="btn btn-danger w-100">Eliminar servicio</button>
       </form>
+      </div>
     </div>
-  </div>
+  }
 </div>

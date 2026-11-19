@@ -7,9 +7,12 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
   <div>
     <h1 class="h3 fw-extrabold mb-1">Servicios y tarifas</h1>
-    <p class="text-secondary small mb-0">Filtra por nombre, tipo o estado y abre la vista de cada servicio para editar o activar/desactivar.</p>
+    <p class="text-secondary small mb-0">Consulta el detalle de cada servicio y abre su vista individual para editar o desactivar.</p>
   </div>
-  <span class="badge text-bg-info">@Model.Count() servicio(s)</span>
+  <div class="d-flex align-items-center gap-2">
+    <span class="badge text-bg-info">@Model.Count() servicio(s)</span>
+    <a href="/admin/servicios/nuevo" class="btn btn-sm btn-sky">+ Nuevo servicio</a>
+  </div>
 </div>
 
 <div class="panel-card p-3 p-md-4 mb-4">
@@ -41,12 +44,12 @@
   <table class="data-table" id="adminServicesTable">
     <thead>
       <tr>
-        <th>Servicio</th>
-        <th>Tipo</th>
-        <th>Duración</th>
-        <th>Tarifas</th>
-        <th>Estado</th>
-        <th>Acciones</th>
+        <th>SERVICIO</th>
+        <th>TIPO</th>
+        <th>DURACIÓN</th>
+        <th>TARIFAS</th>
+        <th>ESTADO</th>
+        <th>ACCIONES</th>
       </tr>
     </thead>
     <tbody>
@@ -57,23 +60,23 @@
         var typeVal = s.IsFleetService ? "fleet" : "individual";
         var statusVal = s.IsActive ? "active" : "inactive";
         <tr data-search="@searchBlob" data-type="@typeVal" data-status="@statusVal">
-          <td data-label="Servicio">
+          <td data-label="SERVICIO">
             <div class="fw-bold">@s.Name</div>
             <div class="small text-secondary">@s.Description</div>
           </td>
-          <td data-label="Tipo">
+          <td data-label="TIPO">
             <span class="badge @(s.IsFleetService ? "text-bg-primary" : "text-bg-info")">
               @(s.IsFleetService ? "Flota (+5)" : "Individual")
             </span>
           </td>
-          <td data-label="Duración">@s.DurationMinutes min</td>
-          <td data-label="Tarifas"><span class="small">@tarifasSummary</span></td>
-          <td data-label="Estado">
+          <td data-label="DURACIÓN">@s.DurationMinutes min</td>
+          <td data-label="TARIFAS"><span class="small">@tarifasSummary</span></td>
+          <td data-label="ESTADO">
             <span class="badge @(s.IsActive ? "text-bg-success" : "text-bg-secondary")">
               @(s.IsActive ? "Activo" : "Inactivo")
             </span>
           </td>
-          <td data-label="Acciones">
+          <td data-label="ACCIONES">
             <a href="/admin/servicios/@s.Id" class="btn btn-sm btn-sky">Editar / Estado</a>
           </td>
         </tr>

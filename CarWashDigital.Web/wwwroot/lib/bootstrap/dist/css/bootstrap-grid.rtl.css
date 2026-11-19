@@ -4083,24 +4083,42 @@
 }
 /*# sourceMappingURL=bootstrap-grid.rtl.css.map */
 
-/* Scroll exclusivo en tablas con cabecera fija */
 .data-table-wrap {
-  max-height: 520px;
-  overflow: auto;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
   border-radius: 14px;
   border: 1px solid var(--bd, rgba(148, 163, 184, 0.25));
   background: var(--sf, transparent);
-  scrollbar-gutter: stable;
 }
 .data-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
+  margin-bottom: 0;
 }
-.data-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: var(--sf2, #0f172a);
-  box-shadow: inset 0 -1px 0 var(--bd, rgba(148, 163, 184, 0.28));
+
+/* Encabezado diferenciado, tipografía y alineación en todas las tablas */
+table.table > thead,
+table.table > thead > tr {
+  background-color: var(--sf2, #e2e8f0) !important;
+}
+table.table > thead > tr > th,
+.data-table thead th,
+table thead th {
+  background-color: var(--sf2, #e2e8f0) !important;
+  color: var(--text, #0f172a) !important;
+  font-family: "Plus Jakarta Sans", "Inter", system-ui, -apple-system, sans-serif !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  padding: 0.9rem 1.15rem !important;
+  vertical-align: middle !important;
+  border-bottom: 2px solid var(--bd, rgba(100, 116, 139, 0.35)) !important;
+}
+table.table > tbody > tr > td,
+.data-table tbody td,
+table tbody td {
+  padding: 0.85rem 1.15rem !important;
+  vertical-align: middle !important;
 }

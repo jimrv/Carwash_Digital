@@ -12,7 +12,11 @@ public class HomeController : Controller
     [HttpGet("/")]
     public async Task<IActionResult> Index()
     {
-        var services = await _db.Services.Where(s => s.IsActive).OrderBy(s => s.Code).ToListAsync();
+        var mainCodes = new[] { "s1", "s2", "s3" };
+        var services = await _db.Services
+            .Where(s => s.IsActive && mainCodes.Contains(s.Code))
+            .OrderBy(s => s.Code)
+            .ToListAsync();
         return View(services);
     }
 
@@ -21,6 +25,14 @@ public class HomeController : Controller
     {
         var services = await _db.Services.Where(s => s.IsActive).OrderBy(s => s.Code).ToListAsync();
         return View(services);
+    }
+
+    [HttpGet("/servicios/{id:guid}")]
+    public async Task<IActionResult> ServiceDetail(Guid id)
+    {
+        var svc = await _db.Services.FirstOrDefaultAsync(s => s.Id == id && s.IsActive);
+        if (svc == null) return NotFound();
+        return View(svc);
     }
 
     [HttpGet("/como-funciona")]

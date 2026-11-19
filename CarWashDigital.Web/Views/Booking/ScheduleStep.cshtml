@@ -1,53 +1,50 @@
 @model ScheduleStepVm
 @{
-    ViewData["Title"] = "Fecha y horario";
-    var steps = new[] { "Servicio", "Vehículo", "Fecha y hora", "Confirmación" };
-    var minDate = DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd");
-    var selIso = Model.SelectedDate.ToString("yyyy-MM-dd");
+    ViewData["Title"] = "Paso 3 · Elegir horario";
 }
-<section class="s">
-  <div class="steps">
-    @for (var i = 0; i < steps.Length; i++)
-    {
-      <span class="@(i <= 2 ? "on" : "")">@steps[i]</span>
-    }
+<section class="container py-4 py-md-5">
+  <div class="mb-4">
+    <span class="badge text-bg-info mb-2">Paso 3 de 4</span>
+    <h1 class="h2 fw-extrabold mb-1">Elige fecha y bloque horario</h1>
+    <p class="text-secondary mb-0">Servicio: <b>@Model.Service.Name</b> · Vehículo: <b>@Model.Vehicle.Brand @Model.Vehicle.Model (@Model.Vehicle.Plate)</b></p>
   </div>
-  <h2>Fecha y horario</h2>
 
-  <form method="get" action="/reservar/horario">
-    <input type="hidden" name="serviceId" value="@Model.Service.Id" />
-    <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
-    @if (Model.RescheduleId.HasValue)
-    {
-      <input type="hidden" name="rescheduleId" value="@Model.RescheduleId.Value" />
-    }
-    <label for="dt">Fecha</label>
-    <input id="dt" name="date" type="date" min="@minDate" value="@selIso" onchange="this.form.submit()" style="max-width:220px" />
-  </form>
-
-  <p></p>
-
-  @if (Model.Slots.Any())
-  {
-    <div class="slots">
-      @foreach (var s in Model.Slots)
+  <div class="panel-card p-4 p-md-5">
+    <form method="get" action="/reservar/horario" class="row g-3 align-items-end mb-4">
+      <input type="hidden" name="serviceId" value="@Model.Service.Id" />
+      <input type="hidden" name="vehicleId" value="@Model.Vehicle.Id" />
+      @if (Model.RescheduleId.HasValue)
       {
-        var disabled = s.FreeCapacity < 1 || s.IsPast;
-        var label = s.IsPast ? "Pasado" : (s.FreeCapacity < 1 ? "Sin cupo" : $"{s.FreeCapacity} cupo(s)");
-        var url = $"/reservar/confirmacion?serviceId={Model.Service.Id}&vehicleId={Model.Vehicle.Id}&date={selIso}&timeSlot={Uri.EscapeDataString(s.Time)}" + (Model.RescheduleId.HasValue ? $"&rescheduleId={Model.RescheduleId.Value}" : "");
-        if (disabled)
-        {
-          <button type="button" class="slot" disabled>@s.Time<br /><small>@label</small></button>
-        }
-        else
-        {
-          <a class="slot" href="@url">@s.Time<br /><small>@label</small></a>
-        }
+        <input type="hidden" name="rescheduleId" value="@Model.RescheduleId.Value" />
+      }
+      <div class="col-12 col-sm-6 col-md-4">
+        <label for="bDate" class="form-label fw-semibold">Fecha de atención</label>
+        <input id="bDate" type="date" name="date" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" class="form-control" onchange="this.form.submit()" />
+      </div>
+    </form>
+
+    <div class="row g-3">
+      @foreach (var slot in Model.Slots)
+      {
+        var isAvail = !slot.IsPast && slot.FreeCapacity > 0;
+        <div class="col-6 col-sm-4 col-md-3">
+          @if (isAvail)
+          {
+            var url = $"/reservar/confirmacion?serviceId={Model.Service.Id}&vehicleId={Model.Vehicle.Id}&date={Model.SelectedDate:yyyy-MM-dd}&timeSlot={Uri.EscapeDataString(slot.Time)}" + (Model.RescheduleId.HasValue ? $"&rescheduleId={Model.RescheduleId.Value}" : "");
+            <a href="@url" class="btn btn-outline-info w-100 py-3 d-flex flex-column align-items-center">
+              <span class="fw-bold">@slot.Time</span>
+              <span class="small">@slot.FreeCapacity cupo(s) libre(s)</span>
+            </a>
+          }
+          else
+          {
+            <button type="button" class="btn btn-secondary w-100 py-3 d-flex flex-column align-items-center" disabled>
+              <span class="fw-bold">@slot.Time</span>
+              <span class="small">@(slot.IsPast ? "Horario pasado" : "Sin cupo")</span>
+            </button>
+          }
+        </div>
       }
     </div>
-  }
-  else
-  {
-    <div class="empty">No hay horarios disponibles ese día. Prueba con otra fecha.</div>
-  }
+  </div>
 </section>

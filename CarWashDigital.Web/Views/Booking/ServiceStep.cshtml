@@ -1,15 +1,12 @@
 @model IEnumerable<ServiceItem>
 @{
-    ViewData["Title"] = "Elige tu servicio";
-    var steps = new[] { "Servicio", "Vehículo", "Fecha y hora", "Confirmación" };
+    ViewData["Title"] = "Paso 1 · Elegir servicio";
 }
-<section class="s">
-  <div class="steps">
-    @for (var i = 0; i < steps.Length; i++)
-    {
-      <span class="@(i <= 0 ? "on" : "")">@steps[i]</span>
-    }
+<section class="container py-4 py-md-5">
+  <div class="mb-4">
+    <span class="badge text-bg-info mb-2">Paso 1 de 4</span>
+    <h1 class="h2 fw-extrabold mb-1">Elige el servicio</h1>
+    <p class="text-secondary mb-0">Selecciona un servicio individual o un plan para flotas empresariales (+5 vehículos).</p>
   </div>
-  <h2>Elige tu servicio</h2>
   @await Html.PartialAsync("_ServiceGrid", Model)
 </section>

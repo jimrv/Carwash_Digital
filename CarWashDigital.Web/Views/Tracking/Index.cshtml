@@ -1,44 +1,66 @@
 @model TrackingVm
-@{ ViewData["Title"] = "Seguimiento del vehículo"; }
-<section class="s">
-  <h2>Seguimiento del vehículo</h2>
-  <div class="grid">
-    <div>
-      <form method="get" action="/seguimiento">
-        <label for="cd">Código de reserva</label>
-        <input id="cd" name="code" value="@Model.SearchCode" />
-        <p></p>
-        <button type="submit" class="btn">Consultar</button>
-      </form>
-    </div>
-    @if (Model.MyBookings.Any())
-    {
-      <div>
-        <label for="mb">O elige una de tus reservas</label>
-        <select id="mb" onchange="if(this.value) location.href='/seguimiento/' + encodeURIComponent(this.value)">
-          <option value="">Seleccionar</option>
-          @foreach (var b in Model.MyBookings)
-          {
-            <option value="@b.Code">@b.Code · @b.Date.ToString("dd/MM/yyyy") @b.TimeSlot</option>
-          }
-        </select>
-      </div>
-    }
-  </div>
+@{
+    ViewData["Title"] = "Seguimiento del vehículo";
+    var codeVal = Model?.SearchCode ?? "";
+    var booking = Model?.FoundBooking;
+}
+<section class="container py-4 py-md-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="panel-card p-4 p-md-5 mb-4">
+        <span class="badge text-bg-info mb-2">Estado en tiempo real</span>
+        <h1 class="h2 fw-extrabold mb-1">Seguimiento del vehículo</h1>
+        <p class="text-secondary mb-4">Ingresa tu código de reserva para conocer en qué etapa del lavado se encuentra tu auto.</p>
 
-  @if (!string.IsNullOrWhiteSpace(Model.SearchCode))
-  {
-    if (Model.FoundBooking != null)
-    {
-      <div class="card" style="margin-top:20px">
-        <h3>@Model.FoundBooking.BookingCode · @Model.FoundBooking.VehicleBrand @Model.FoundBooking.VehicleModel</h3>
-        <p>@Model.FoundBooking.ServiceName · @Model.FoundBooking.Date.ToString("dd/MM/yyyy") @Model.FoundBooking.TimeSlot</p>
-        @await Html.PartialAsync("_BookingTracker", Model.FoundBooking)
+        <form method="get" action="/seguimiento" class="row g-3 align-items-end">
+          <div class="col-12 col-sm-8">
+            <label for="trkCode" class="form-label fw-semibold">Código de reserva</label>
+            <input id="trkCode" name="code" value="@codeVal" class="form-control form-control-lg" placeholder="Ej. CW-1024" required />
+          </div>
+          <div class="col-12 col-sm-4">
+            <button type="submit" class="btn btn-sky btn-lg w-100">Consultar</button>
+          </div>
+        </form>
+
+        @if (Model?.MyBookings != null && Model.MyBookings.Any())
+        {
+          <div class="mt-4 pt-3 border-top">
+            <div class="small fw-semibold text-secondary mb-2">Tus reservas activas:</div>
+            <div class="d-flex flex-wrap gap-2">
+              @foreach (var opt in Model.MyBookings)
+              {
+                <a href="/seguimiento?code=@opt.Code" class="btn btn-outline-info btn-sm">@opt.Code · @opt.Date.ToString("dd/MM/yyyy") @opt.TimeSlot</a>
+              }
+            </div>
+          </div>
+        }
       </div>
-    }
-    else
-    {
-      <div class="empty">No encontramos una reserva con ese código. Revisa el código e inténtalo otra vez.</div>
-    }
-  }
+
+      @if (!string.IsNullOrWhiteSpace(codeVal) && booking == null)
+      {
+        <div class="alert alert-warning" role="alert">
+          No se encontró ninguna reserva con el código <b>@codeVal</b>. Verifica e inténtalo de nuevo.
+        </div>
+      }
+
+      @if (booking != null)
+      {
+        <div class="panel-card p-4 p-md-5">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div>
+              <span class="badge text-bg-info">@booking.Status</span>
+              <h2 class="h4 fw-bold mt-2 mb-0">@booking.ServiceName · @booking.BookingCode</h2>
+            </div>
+            <span class="price-tag">S/ @booking.Price</span>
+          </div>
+
+          <p class="text-secondary small mb-3">
+            Vehículo: <b>@booking.VehicleBrand @booking.VehicleModel (@booking.VehiclePlate)</b> · Fecha: <b>@booking.Date.ToString("dd/MM/yyyy") @booking.TimeSlot</b>
+          </p>
+
+          @await Html.PartialAsync("_BookingTracker", booking)
+        </div>
+      }
+    </div>
+  </div>
 </section>

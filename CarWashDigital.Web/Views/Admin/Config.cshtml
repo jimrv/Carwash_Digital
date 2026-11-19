@@ -5,34 +5,66 @@
     ViewData["ActiveSection"] = "admin/config";
     var dayNames = new[] { "Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb" };
 }
-<h2>Horarios y capacidad</h2>
-<form class="card" style="max-width:520px" asp-controller="Admin" asp-action="SaveConfig" method="post">
-  @Html.AntiForgeryToken()
+<div class="mb-4">
+  <h1 class="h3 fw-extrabold mb-1">Horarios y capacidad</h1>
+  <p class="text-secondary small mb-0">Configura atención diaria, bahías simultáneas y días cerrados.</p>
+</div>
 
-  <label for="co">Apertura (hora)</label>
-  <input id="co" name="openHour" type="number" min="0" max="23" value="@Model.OpenHour" required />
+<div class="row g-4 align-items-start">
+  <div class="col-12 col-lg-7">
+    <form class="panel-card p-4 p-md-5" asp-controller="Admin" asp-action="SaveConfig" method="post">
+      @Html.AntiForgeryToken()
 
-  <label for="cc">Cierre (hora)</label>
-  <input id="cc" name="closeHour" type="number" min="1" max="24" value="@Model.CloseHour" required />
+      <div class="row g-3 mb-3">
+        <div class="col-12 col-sm-6">
+          <label for="co" class="form-label fw-semibold">Hora de apertura</label>
+          <input id="co" name="openHour" type="number" min="0" max="23" value="@Model.OpenHour" class="form-control" required />
+        </div>
+        <div class="col-12 col-sm-6">
+          <label for="cc" class="form-label fw-semibold">Hora de cierre</label>
+          <input id="cc" name="closeHour" type="number" min="1" max="24" value="@Model.CloseHour" class="form-control" required />
+        </div>
+      </div>
 
-  <label for="cp">Bahías / cupos por bloque</label>
-  <input id="cp" name="capacityPerSlot" type="number" min="1" value="@Model.CapacityPerSlot" required />
+      <div class="mb-3">
+        <label for="cp" class="form-label fw-semibold">Bahías / cupos por bloque horario</label>
+        <input id="cp" name="capacityPerSlot" type="number" min="1" value="@Model.CapacityPerSlot" class="form-control" required />
+      </div>
 
-  <label>Días de atención</label>
-  <p>
-    @for (var i = 0; i < dayNames.Length; i++)
-    {
-      var checkedDay = Model.OpenDays.Contains(i);
-      <label style="display:inline-block;margin-right:10px">
-        <input type="checkbox" name="openDays" value="@i" checked="@checkedDay" style="width:auto;min-height:0" /> @dayNames[i]
-      </label>
-    }
-  </p>
+      <div class="mb-3">
+        <label class="form-label fw-semibold d-block">Días de atención</label>
+        <div class="d-flex flex-wrap gap-3 pt-1">
+          @for (var i = 0; i < dayNames.Length; i++)
+          {
+            var checkedDay = Model.OpenDays.Contains(i);
+            var idDay = $"day_{i}";
+            <div class="form-check">
+              <input id="@idDay" type="checkbox" name="openDays" value="@i" checked="@checkedDay" class="form-check-input" />
+              <label for="@idDay" class="form-check-label">@dayNames[i]</label>
+            </div>
+          }
+        </div>
+      </div>
 
-  <label for="cx">Fechas no disponibles (AAAA-MM-DD, separadas por coma)</label>
-  <input id="cx" name="closedDatesText" value="@string.Join(", ", Model.ClosedDates)" />
+      <div class="mb-4">
+        <label for="cx" class="form-label fw-semibold">Fechas no disponibles (AAAA-MM-DD, separadas por coma)</label>
+        <input id="cx" name="closedDatesText" value="@string.Join(", ", Model.ClosedDates)" class="form-control" placeholder="2026-12-25, 2027-01-01" />
+      </div>
 
-  <p></p>
-  <button type="submit" class="btn">Guardar configuración</button>
-  <p><small>Los cambios no cancelan reservas ya confirmadas.</small></p>
-</form>
+      <button type="submit" class="btn btn-sky px-4">Guardar configuración</button>
+      <div class="form-text mt-2">Los cambios no cancelan reservas ya confirmadas.</div>
+    </form>
+  </div>
+
+  <div class="col-12 col-lg-5">
+    <div class="panel-card p-4">
+      <h2 class="h6 fw-bold mb-2">Resumen operativo actual</h2>
+      <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+        <li><b>Franja horaria:</b> @Model.OpenHour:00 – @Model.CloseHour:00</li>
+        <li><b>Cupos por bloque:</b> @Model.CapacityPerSlot vehículo(s)</li>
+        <li><b>Días activos:</b> @(Model.OpenDays.Any() ? string.Join(", ", Model.OpenDays.OrderBy(x => x).Select(x => dayNames[x])) : "Ninguno")</li>
+        <li><b>Fechas cerradas:</b> @(Model.ClosedDates.Any() ? string.Join(", ", Model.ClosedDates) : "Ninguna")</li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,54 +1,75 @@
 @model IEnumerable<ServiceItem>
 @{
-    ViewData["Title"] = "Car Wash Digital";
-    var steps = new[] {
-        "Selecciona el servicio",
-        "Registra tu vehículo",
-        "Reserva fecha y horario",
-        "Consulta el estado y recoge tu vehículo"
-    };
+    ViewData["Title"] = "CarWash Digital · Tu auto, nuestra pasión";
 }
-<section class="hero">
-  <div class="in">
+<section class="hero-tech py-5">
+  <div class="container py-2">
+    @if (TempData["Success"] != null)
+    {
+      <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+      <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    }
+    <div class="row align-items-center g-4">
+      <div class="col-12 col-lg-7">
+        <span class="badge rounded-pill text-bg-info mb-3">⚡ Reserva digital · Sin colas</span>
+        <h1 class="display-5 fw-extrabold mb-3 text-white">Tu auto limpio y protegido, <span style="color:#38BDF8">en el horario que elijas.</span></h1>
+        <p class="lead mb-4" style="color:#CBD5E1">Agenda turnos para tu vehículo o flota, conoce el precio por categoría y sigue cada etapa del lavado desde tu celular.</p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a class="btn btn-sky btn-lg px-4" href="/reservar/servicio">Reservar mi lavado</a>
+          <a class="btn btn-outline-light btn-lg px-4" href="/servicios">Explorar servicios</a>
+        </div>
+      </div>
+      <div class="col-12 col-lg-5">
+        <div class="hero-frame">
+          <img src="/images/hero-wash.jfif" onerror="this.onerror=null;this.src='/images/hero-carwash.svg';" alt="Bahía de CarWash Digital" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="row g-4">
+    <div class="col-12 col-md-4">
+      <div class="panel-card p-4 h-100">
+        <div class="fs-4 mb-2">⏱️</div>
+        <h3 class="h6 fw-bold">Horarios con cupo real</h3>
+        <p class="text-secondary small mb-0">Elige fecha y hora disponible sin esperas innecesarias en el local.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="panel-card p-4 h-100">
+        <div class="fs-4 mb-2">🛡️</div>
+        <h3 class="h6 fw-bold">Tarifas transparentes</h3>
+        <p class="text-secondary small mb-0">Consulta el detalle y precio según categoría antes de confirmar.</p>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="panel-card p-4 h-100">
+        <div class="fs-4 mb-2">📱</div>
+        <h3 class="h6 fw-bold">Seguimiento en vivo</h3>
+        <p class="text-secondary small mb-0">Revisa si tu vehículo está en ingreso, lavado, secado o listo para recoger.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container pb-5">
+  <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-4">
     <div>
-      <h1>Tu auto limpio, sin perder tiempo en colas.</h1>
-      <p>Reserva tu horario, conoce el precio antes de llegar y sigue el estado de tu vehículo desde una sola plataforma.</p>
-      <a class="btn" href="/reservar/servicio">Reservar mi lavado</a>
-      <a class="btn ghost-dark" href="/servicios">Ver servicios y precios</a>
+      <h2 class="h3 fw-extrabold mb-1">Servicios principales</h2>
+      <p class="text-secondary small mb-0">Haz clic en <b>Ver detalle</b> para revisar inclusiones y tarifas por categoría.</p>
     </div>
-    <img src="/images/logo.jpg" alt="Logo Car Wash Digital" />
+    <a href="/servicios" class="btn btn-outline-info btn-sm px-3">Ver todos (individuales y flotas)</a>
   </div>
-</section>
-
-<section class="s">
-  <div class="grid">
-    <div class="card l"><h3>Reserva programada</h3><p>Elige una fecha y un horario disponible.</p></div>
-    <div class="card l"><h3>Precios transparentes</h3><p>Consulta las tarifas antes de confirmar.</p></div>
-    <div class="card l"><h3>Seguimiento digital</h3><p>Conoce el estado de tu vehículo durante el servicio.</p></div>
-  </div>
-</section>
-
-<section class="s dark" style="max-width:none">
-  <div style="max-width:1150px;margin:auto">
-    <h2>Cómo funciona</h2>
-    <div class="grid">
-      @for (var i = 0; i < steps.Length; i++)
-      {
-        <div><b style="color:var(--b)">Paso @(i + 1)</b><p>@steps[i]</p></div>
-      }
-    </div>
-  </div>
-</section>
-
-<section class="s">
-  <h2>Servicios destacados</h2>
-  @await Html.PartialAsync("_ServiceGrid", Model)
-</section>
-
-<section class="s">
-  <div class="card">
-    <h3>Sabrás cuánto pagas antes de confirmar</h3>
-    <p>El precio y los tratamientos incluidos se muestran en el resumen de tu reserva y quedan registrados al confirmar.</p>
-    <a class="btn" href="/reservar/servicio">Reservar mi próximo lavado</a>
-  </div>
+  @await Html.PartialAsync("_ServiceGrid", Model.Take(3))
 </section>

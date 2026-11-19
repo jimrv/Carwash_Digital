@@ -1,41 +1,59 @@
 @model RegisterVm
-@{ ViewData["Title"] = "Crear cuenta"; }
-<div class="form">
-  <img class="logo" src="/images/logo.jpg" alt="Car Wash Digital" />
-  <h2>Crear cuenta</h2>
-  <form asp-controller="Account" asp-action="Register" method="post">
-    @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="val-err"></div>
+@{
+    ViewData["Title"] = "Crear cuenta";
+}
+<section class="container py-4 py-md-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <form class="panel-card p-4 p-md-5" asp-controller="Account" asp-action="Register" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+        <h1 class="h3 fw-extrabold mb-1">Crear cuenta</h1>
+        <p class="text-secondary small mb-4">Regístrate como cliente particular o empresa con flota.</p>
 
-    <label asp-for="Name">Nombre completo</label>
-    <input asp-for="Name" required />
+        <div class="mb-3">
+          <label asp-for="Name" class="form-label fw-semibold">Nombre completo</label>
+          <input asp-for="Name" class="form-control" required />
+        </div>
 
-    <label asp-for="Email">Correo electrónico</label>
-    <input asp-for="Email" type="email" required />
-    <span asp-validation-for="Email" class="val-err"></span>
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-sm-6">
+            <label asp-for="Email" class="form-label fw-semibold">Correo electrónico</label>
+            <input asp-for="Email" type="email" class="form-control" required />
+          </div>
+          <div class="col-12 col-sm-6">
+            <label asp-for="Phone" class="form-label fw-semibold">Teléfono</label>
+            <input asp-for="Phone" class="form-control" required />
+          </div>
+        </div>
 
-    <label asp-for="Phone">Celular</label>
-    <input asp-for="Phone" type="tel" required />
+        <div class="mb-3">
+          <label asp-for="Password" class="form-label fw-semibold">Contraseña</label>
+          <input asp-for="Password" type="password" class="form-control" required />
+        </div>
 
-    <label asp-for="AccountType">Tipo de cuenta</label>
-    <select asp-for="AccountType">
-      <option value="Individual">Particular</option>
-      <option value="Fleet">Empresa / Flota</option>
-    </select>
+        <div class="mb-3">
+          <label asp-for="AccountType" class="form-label fw-semibold">Tipo de cuenta</label>
+          <select asp-for="AccountType" class="form-select">
+            <option value="Individual">Particular</option>
+            <option value="Fleet">Flota / Empresa</option>
+          </select>
+        </div>
 
-    <label asp-for="CompanyName">Empresa / Flota (opcional)</label>
-    <input asp-for="CompanyName" />
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-sm-6">
+            <label asp-for="CompanyName" class="form-label fw-semibold">Empresa (opcional)</label>
+            <input asp-for="CompanyName" class="form-control" />
+          </div>
+          <div class="col-12 col-sm-6">
+            <label asp-for="Ruc" class="form-label fw-semibold">RUC (opcional)</label>
+            <input asp-for="Ruc" class="form-control" />
+          </div>
+        </div>
 
-    <label asp-for="Password">Contraseña (mínimo 8 caracteres)</label>
-    <input asp-for="Password" type="password" minlength="8" required />
-    <span asp-validation-for="Password" class="val-err"></span>
-
-    <label asp-for="ConfirmPassword">Confirmar contraseña</label>
-    <input asp-for="ConfirmPassword" type="password" required />
-    <span asp-validation-for="ConfirmPassword" class="val-err"></span>
-
-    <p><input asp-for="AcceptTerms" type="checkbox" required style="width:auto;min-height:0" /> Acepto términos y política de privacidad</p>
-    <button type="submit" class="btn" style="width:100%">Registrarme</button>
-  </form>
-  <p><a href="/login">Ya tengo cuenta</a></p>
-</div>
+        <button type="submit" class="btn btn-sky btn-lg w-100 mb-3">Registrarme</button>
+        <div class="text-center small">¿Ya tienes cuenta? <a href="/login" class="fw-semibold text-decoration-none">Inicia sesión</a></div>
+      </form>
+    </div>
+  </div>
+</section>

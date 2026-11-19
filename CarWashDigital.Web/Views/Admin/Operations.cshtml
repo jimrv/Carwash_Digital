@@ -3,32 +3,49 @@
     Layout = "_LayoutApp";
     ViewData["Title"] = "Tablero de lavado";
     ViewData["ActiveSection"] = "admin/operaciones";
-    var cols = new[] { "Confirmada", "Ingresado", "En lavado", "En secado", "Listo para recoger" };
+    var stages = new[] { "Confirmada", "Ingresado", "En lavado", "En secado", "Listo para recoger" };
+    var nextMap = new Dictionary<string, string> {
+        ["Confirmada"] = "Ingresado",
+        ["Ingresado"] = "En lavado",
+        ["En lavado"] = "En secado",
+        ["En secado"] = "Listo para recoger",
+        ["Listo para recoger"] = "Entregada"
+    };
 }
-<h2>Tablero de lavado</h2>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="h3 fw-extrabold mb-1">Tablero de lavado</h1>
+    <p class="text-secondary small mb-0">Avanza el estado de cada vehículo en bahía sin perder visibilidad de ninguna etapa.</p>
+  </div>
+</div>
+
 <div class="board">
-  @foreach (var st in cols)
+  @foreach (var st in stages)
   {
     var items = Model.Where(b => b.Status == st).ToList();
     <div class="col">
-      <b>@st</b>
-      @if (items.Any())
+      <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <h3 class="h6 fw-bold mb-0">@st</h3>
+        <span class="badge text-bg-info">@items.Count</span>
+      </div>
+
+      @if (!items.Any())
       {
-        @foreach (var b in items)
-        {
-          <div class="card l">
-            <a href="/admin/reservas/@b.Id"><b>@b.BookingCode</b></a> @b.TimeSlot<br />
-            @b.VehicleBrand @b.VehicleModel · @b.ServiceName
-            <form asp-controller="Admin" asp-action="AdvanceFromBoard" asp-route-id="@b.Id" method="post" style="margin-top:8px">
-              @Html.AntiForgeryToken()
-              <button type="submit" class="btn sm">@(st == "Listo para recoger" ? "Entregar" : "Avanzar")</button>
-            </form>
-          </div>
-        }
+        <p class="text-secondary small mb-0">Sin vehículos en esta etapa.</p>
       }
-      else
+
+      @foreach (var b in items)
       {
-        <div class="empty">Sin vehículos</div>
+        <div class="p-3 rounded-3 border mb-2" style="background:var(--sf2);border-color:var(--bd)!important">
+          <div class="fw-bold small">@b.TimeSlot · @b.VehiclePlate</div>
+          <div class="small">@b.VehicleBrand @b.VehicleModel</div>
+          <div class="small text-secondary mb-2">@b.ServiceName</div>
+          <form asp-controller="Admin" asp-action="AdvanceStatus" asp-route-id="@b.Id" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="nextStatus" value="@nextMap[st]" />
+            <button type="submit" class="btn btn-sky btn-sm w-100">Mover a @nextMap[st]</button>
+          </form>
+        </div>
       }
     </div>
   }

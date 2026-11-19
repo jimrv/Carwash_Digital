@@ -4,24 +4,51 @@
     ViewData["Title"] = "Perfil";
     ViewData["ActiveSection"] = "cliente/perfil";
 }
-<h2>Perfil</h2>
-<form class="card" style="max-width:460px" asp-controller="Client" asp-action="Profile" method="post">
-  @Html.AntiForgeryToken()
-  <label for="nm">Nombre</label>
-  <input id="nm" name="name" value="@Model.Name" required />
+<div class="mb-4">
+  <h1 class="h3 fw-extrabold mb-1">Mi perfil</h1>
+  <p class="text-secondary small mb-0">Actualiza tus datos de contacto y tipo de cuenta.</p>
+</div>
 
-  <label for="ph">Celular</label>
-  <input id="ph" name="phone" value="@Model.Phone" />
+<div class="row">
+  <div class="col-12 col-lg-7 col-xl-6">
+    <form class="panel-card p-4 p-md-5" asp-controller="Client" asp-action="SaveProfile" method="post">
+      @Html.AntiForgeryToken()
 
-  <label for="cn">Empresa / Flota (opcional)</label>
-  <input id="cn" name="companyName" value="@Model.CompanyName" />
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Nombre completo</label>
+        <input name="name" value="@Model.Name" class="form-control" required />
+      </div>
 
-  <label for="rc">RUC (opcional)</label>
-  <input id="rc" name="ruc" value="@Model.Ruc" />
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Correo electrónico</label>
+        <input value="@Model.Email" class="form-control" disabled />
+      </div>
 
-  <label for="np">Nueva contraseña (opcional)</label>
-  <input id="np" name="newPassword" type="password" />
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Teléfono</label>
+        <input name="phone" value="@Model.Phone" class="form-control" required />
+      </div>
 
-  <p></p>
-  <button type="submit" class="btn">Guardar cambios</button>
-</form>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Tipo de cuenta</label>
+        <select name="accountType" class="form-select">
+          <option value="Individual" selected="@(Model.AccountType != "Fleet")">Particular</option>
+          <option value="Fleet" selected="@(Model.AccountType == "Fleet")">Flota / Empresa</option>
+        </select>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6">
+          <label class="form-label fw-semibold">Empresa (si es flota)</label>
+          <input name="companyName" value="@Model.CompanyName" class="form-control" />
+        </div>
+        <div class="col-12 col-sm-6">
+          <label class="form-label fw-semibold">RUC (opcional)</label>
+          <input name="ruc" value="@Model.Ruc" class="form-control" />
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-sky px-4">Guardar cambios</button>
+    </form>
+  </div>
+</div>

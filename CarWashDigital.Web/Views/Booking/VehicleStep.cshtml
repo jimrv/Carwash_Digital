@@ -1,65 +1,81 @@
 @model VehicleStepVm
 @{
-    ViewData["Title"] = "Tu vehículo";
-    var steps = new[] { "Servicio", "Vehículo", "Fecha y hora", "Confirmación" };
+    ViewData["Title"] = "Paso 2 · Elegir vehículo";
     var cats = new[] { "Sedán", "SUV", "Pick-up 4x4" };
 }
-<section class="s">
-  <div class="steps">
-    @for (var i = 0; i < steps.Length; i++)
-    {
-      <span class="@(i <= 1 ? "on" : "")">@steps[i]</span>
-    }
+<section class="container py-4 py-md-5">
+  <div class="mb-4">
+    <span class="badge text-bg-info mb-2">Paso 2 de 4</span>
+    <h1 class="h2 fw-extrabold mb-1">Tu vehículo · @Model.Service.Name</h1>
+    <p class="text-secondary mb-0">Selecciona un vehículo registrado o registra uno nuevo para continuar.</p>
   </div>
-  <h2>Tu vehículo</h2>
-  @if (Model.RescheduleId.HasValue)
-  {
-    <p>Reprogramando: el vehículo no cambia.</p>
-  }
 
-  @if (Model.Vehicles.Any())
-  {
-    <form method="get" action="/reservar/horario">
-      <input type="hidden" name="serviceId" value="@Model.Service.Id" />
-      @if (Model.RescheduleId.HasValue)
-      {
-        <input type="hidden" name="rescheduleId" value="@Model.RescheduleId.Value" />
-      }
-      <label for="vs">Vehículos registrados</label>
-      <select id="vs" name="vehicleId">
-        @foreach (var v in Model.Vehicles)
+  <div class="row g-4 align-items-start">
+    <div class="col-12 col-lg-7">
+      <div class="panel-card p-4">
+        <h2 class="h5 fw-bold mb-3">Vehículos disponibles</h2>
+        @if (Model.Vehicles.Any())
         {
-          var pr = Model.Service.PricesByCategory[v.Category];
-          <option value="@v.Id">@v.Brand @v.Model · @v.Category · S/ @pr</option>
+          <div class="list-group">
+            @foreach (var v in Model.Vehicles)
+            {
+              <a href="/reservar/horario?serviceId=@Model.Service.Id&vehicleId=@v.Id@(Model.RescheduleId.HasValue ? $"&rescheduleId={Model.RescheduleId.Value}" : "")"
+                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                <div>
+                  <div class="fw-bold">@v.Brand @v.Model <span class="badge text-bg-info ms-1">@v.Category</span></div>
+                  <div class="small text-secondary">Placa: <b>@v.Plate</b> @(string.IsNullOrWhiteSpace(v.Color) ? "" : $"· Color: {v.Color}")</div>
+                </div>
+                <span class="btn btn-sky btn-sm">Elegir →</span>
+              </a>
+            }
+          </div>
         }
-      </select>
-      <p></p>
-      <button type="submit" class="btn">Usar este vehículo</button>
-    </form>
-    <h3 style="margin-top:24px">O registra uno nuevo</h3>
-  }
-  else
-  {
-    <h3>Registra tu vehículo</h3>
-  }
-
-  <form asp-controller="Booking" asp-action="AddVehicle" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="ServiceId" value="@Model.Service.Id" />
-    <input type="hidden" name="ReturnToBooking" value="true" />
-    <div class="grid">
-      <div><label for="vb">Marca</label><input id="vb" name="Brand" required /></div>
-      <div><label for="vm">Modelo</label><input id="vm" name="Model" required /></div>
-      <div>
-        <label for="vc">Categoría</label>
-        <select id="vc" name="Category">
-          @foreach (var c in cats) { <option>@c</option> }
-        </select>
+        else
+        {
+          <p class="text-secondary mb-0">Aún no tienes vehículos compatibles registrados. Registra uno en el formulario de la derecha.</p>
+        }
       </div>
-      <div><label for="vp">Placa</label><input id="vp" name="Plate" required /></div>
-      <div><label for="vo">Color (opcional)</label><input id="vo" name="Color" /></div>
     </div>
-    <p></p>
-    <button type="submit" class="btn">Guardar vehículo</button>
-  </form>
+
+    <div class="col-12 col-lg-5">
+      <form class="panel-card p-4" asp-controller="Booking" asp-action="AddVehicle" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ReturnToBooking" value="true" />
+        <input type="hidden" name="ServiceId" value="@Model.Service.Id" />
+        <h2 class="h5 fw-bold mb-3">Registra tu vehículo</h2>
+
+        <div class="mb-3">
+          <label for="vb" class="form-label fw-semibold">Marca</label>
+          <input id="vb" name="Brand" class="form-control" placeholder="Ej. Toyota" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="vm" class="form-label fw-semibold">Modelo</label>
+          <input id="vm" name="Model" class="form-control" placeholder="Ej. Corolla" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="vc" class="form-label fw-semibold">Categoría</label>
+          <select id="vc" name="Category" class="form-select">
+            @foreach (var c in cats)
+            {
+              <option value="@c">@c</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="vp" class="form-label fw-semibold">Placa</label>
+          <input id="vp" name="Plate" class="form-control" placeholder="Ej. ABC-123" required />
+        </div>
+
+        <div class="mb-4">
+          <label for="vcl" class="form-label fw-semibold">Color (opcional)</label>
+          <input id="vcl" name="Color" class="form-control" placeholder="Ej. Negro" />
+        </div>
+
+        <button type="submit" class="btn btn-sky w-100">Guardar y continuar</button>
+      </form>
+    </div>
+  </div>
 </section>

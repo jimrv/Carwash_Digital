@@ -1,28 +1,142 @@
 @model IEnumerable<ServiceItem>
 @{
-    var cats = new[] { "Sedán", "SUV", "Pick-up 4x4" };
+    string ImgFor(string code) => code switch
+    {
+        "s1" => "/images/svc-express.jfif",
+        "s2" => "/images/svc-completo.jfif",
+        "s3" => "/images/svc-premium.jfif",
+        "s4" => "/images/hero-wash.jfif",
+        "f1" => "/images/svc-express.jfif",
+        "f2" => "/images/svc-premium.jfif",
+        _ => "/images/hero-wash.jfif"
+    };
+    string FallbackSvg(string code) => code switch
+    {
+        "s1" => "/images/svc-express.svg",
+        "s2" => "/images/svc-completo.svg",
+        "s3" => "/images/svc-premium.svg",
+        _ => "/images/hero-carwash.svg"
+    };
 }
-<div class="grid">
+
+<div class="d-flex flex-wrap gap-2 mb-4" role="tablist" aria-label="Categorías de servicio">
+  <button type="button" class="btn btn-sky btn-sm px-3 svc-tab-btn" data-filter="all" onclick="filterServiceTab('all', this)">
+    Todos (@Model.Count())
+  </button>
+  <button type="button" class="btn btn-outline-info btn-sm px-3 svc-tab-btn" data-filter="individual" onclick="filterServiceTab('individual', this)">
+    🚗 Individual · Clientes básicos (@Model.Count(x => !x.IsFleetService))
+  </button>
+  <button type="button" class="btn btn-outline-info btn-sm px-3 svc-tab-btn" data-filter="fleet" onclick="filterServiceTab('fleet', this)">
+    🏢 Empresas · Flotas (+5 autos) (@Model.Count(x => x.IsFleetService))
+  </button>
+</div>
+
+<div class="row g-4" id="serviceCardsGrid">
   @foreach (var s in Model)
   {
-    <div class="card l">
-      <h3>@s.Name</h3>
-      <p>@s.Description</p>
-      <ul>
-        @foreach (var inc in s.Includes)
-        {
-          <li>@inc</li>
-        }
-      </ul>
-      <small>@s.DurationMinutes min aprox.</small>
-      @foreach (var c in cats)
-      {
-        if (s.PricesByCategory.TryGetValue(c, out var pr))
-        {
-          <div>@c: <span class="pr">S/ @pr</span></div>
-        }
-      }
-      <p><a class="btn" href="/reservar/vehiculo?serviceId=@s.Id">Reservar</a></p>
+    var minPrice = s.PricesByCategory.Values.Any() ? s.PricesByCategory.Values.Min() : 0m;
+    var modalId = $"svcModal_{s.Id:N}";
+    var segment = s.IsFleetService ? "fleet" : "individual";
+    <div class="col-12 col-md-6 col-lg-4 svc-col" data-segment="@segment">
+      <div class="svc-card h-100 d-flex flex-column">
+        <div class="position-relative">
+          <img class="svc-img"
+               src="@ImgFor(s.Code)"
+               onerror="this.onerror=null;this.src='@FallbackSvg(s.Code)';"
+               alt="@s.Name" />
+          <span class="badge @(s.IsFleetService ? "text-bg-primary" : "text-bg-dark") position-absolute top-0 start-0 m-3">
+            @(s.IsFleetService ? "Flota +5 autos" : "Individual")
+          </span>
+        </div>
+
+        <div class="p-4 d-flex flex-column flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <h3 class="h5 fw-bold mb-0">@s.Name</h3>
+            <span class="badge rounded-pill text-bg-info">@s.DurationMinutes min</span>
+          </div>
+          <p class="text-secondary small mb-3">@s.Description</p>
+
+          <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center mb-3">
+            <span class="text-secondary small">@(s.IsFleetService ? "Desde (por auto)" : "Desde")</span>
+            <span class="price-tag">S/ @minPrice</span>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#@modalId">
+              Ver detalle
+            </button>
+            <a class="btn btn-sky btn-sm flex-fill" href="/reservar/vehiculo?serviceId=@s.Id">
+              Reservar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="@modalId" tabindex="-1" aria-labelledby="@(modalId)_lbl" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <div>
+              <span class="badge @(s.IsFleetService ? "text-bg-primary" : "text-bg-info") mb-1">
+                @(s.IsFleetService ? "Plan Empresas · Mínimo 5 vehículos" : "Servicio Individual")
+              </span>
+              <h5 class="modal-title fw-bold" id="@(modalId)_lbl">@s.Name</h5>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <img src="@ImgFor(s.Code)"
+                 onerror="this.onerror=null;this.src='@FallbackSvg(s.Code)';"
+                 alt="@s.Name"
+                 class="w-100 rounded-3 mb-3"
+                 style="max-height:185px;object-fit:cover" />
+            <p class="mb-2">@s.Description</p>
+            <p class="small text-secondary mb-3">Duración estimada: <b>@s.DurationMinutes minutos</b></p>
+
+            <div class="fw-semibold small mb-1">¿Qué incluye?</div>
+            <ul class="small mb-3">
+              @foreach (var inc in s.Includes)
+              {
+                <li>@inc</li>
+              }
+            </ul>
+
+            <div class="fw-semibold small mb-2">
+              @(s.IsFleetService ? "Tarifas por tipo de flota (precio por unidad):" : "Tarifas por categoría de vehículo:")
+            </div>
+            <div class="list-group list-group-flush border rounded-3">
+              @foreach (var kv in s.PricesByCategory)
+              {
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                  <span class="small fw-medium">@kv.Key</span>
+                  <span class="fw-bold price-tag fs-6">S/ @kv.Value</span>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="modal-footer">
+            <a class="btn btn-outline-secondary btn-sm" href="/servicios/@s.Id">Ficha completa</a>
+            <a class="btn btn-sky btn-sm" href="/reservar/vehiculo?serviceId=@s.Id">Reservar ahora</a>
+          </div>
+        </div>
+      </div>
     </div>
   }
 </div>
+
+<script>
+function filterServiceTab(seg, btn) {
+  document.querySelectorAll(".svc-tab-btn").forEach((b) => {
+    b.classList.remove("btn-sky");
+    b.classList.add("btn-outline-info");
+  });
+  btn.classList.remove("btn-outline-info");
+  btn.classList.add("btn-sky");
+
+  document.querySelectorAll("#serviceCardsGrid .svc-col").forEach((col) => {
+    const s = col.getAttribute("data-segment");
+    col.style.display = (seg === "all" || s === seg) ? "" : "none";
+  });
+}
+</script>

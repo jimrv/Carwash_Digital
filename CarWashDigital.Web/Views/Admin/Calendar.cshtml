@@ -4,44 +4,41 @@
     ViewData["Title"] = "Calendario operativo";
     ViewData["ActiveSection"] = "admin/calendario";
 }
-<h2>Calendario operativo</h2>
-<form method="get" action="/admin/calendario">
-  <input type="date" name="date" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" onchange="this.form.submit()" style="max-width:220px" />
-</form>
-<p></p>
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+  <div>
+    <h1 class="h3 fw-extrabold mb-1">Calendario operativo</h1>
+    <p class="text-secondary small mb-0">Revisa la ocupación por bloque horario y las reservas asignadas.</p>
+  </div>
+  <form method="get" action="/admin/calendario" class="d-flex align-items-center gap-2">
+    <label for="calDate" class="form-label small fw-semibold mb-0">Fecha:</label>
+    <input id="calDate" type="date" name="date" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" class="form-control" onchange="this.form.submit()" />
+  </form>
+</div>
 
-@if (Model.Rows.Any())
-{
-  <div class="tw">
-    <table>
-      <tr><th>Hora</th><th>Ocupación</th><th>Reservas</th></tr>
-      @foreach (var r in Model.Rows)
+<div class="data-table-wrap">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Hora</th>
+        <th>Ocupación</th>
+        <th>Libres</th>
+        <th>Reservas</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var row in Model.Rows)
       {
         <tr>
-          <td>@r.TimeSlot</td>
-          <td>
-            @r.Used/@Model.CapacityPerSlot
-            @if (r.Free < 1) { <span class="pill er">Completo</span> }
-          </td>
-          <td>
-            @if (r.Bookings.Any())
-            {
-              @foreach (var b in r.Bookings)
-              {
-                <a href="/admin/reservas/@b.Id" style="margin-right:8px">@b.BookingCode @b.VehiclePlate</a>
-              }
-            }
-            else
-            {
-              <text>—</text>
-            }
+          <td data-label="Hora"><b>@row.TimeSlot</b></td>
+          <td data-label="Ocupación"><span class="badge text-bg-info">@row.Used / @Model.CapacityPerSlot</span></td>
+          <td data-label="Libres"><span class="badge @(row.Free > 0 ? "text-bg-success" : "text-bg-secondary")">@row.Free libre(s)</span></td>
+          <td data-label="Reservas">
+            @(row.Bookings.Any()
+              ? string.Join(", ", row.Bookings.Select(b => $"{b.TimeSlot} {b.VehiclePlate} ({b.ServiceName})"))
+              : "Sin reservas asignadas")
           </td>
         </tr>
       }
-    </table>
-  </div>
-}
-else
-{
-  <div class="empty">Día no laborable o fecha pasada.</div>
-}
+    </tbody>
+  </table>
+</div>

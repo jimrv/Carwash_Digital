@@ -5,37 +5,73 @@
     ViewData["ActiveSection"] = "cliente/reservas";
     var filter = ViewBag.Filter?.ToString() ?? "prox";
 }
-<h2>Mis reservas</h2>
-<p>
-  <select onchange="location.href='/cliente/reservas?filter=' + this.value" style="max-width:220px">
-    <option value="prox" selected="@(filter == "prox")">Próximas</option>
-    <option value="comp" selected="@(filter == "comp")">Completadas</option>
-    <option value="canc" selected="@(filter == "canc")">Canceladas</option>
-  </select>
-</p>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <h1 class="h3 fw-extrabold mb-0">Mis reservas</h1>
+  <a href="/reservar/servicio" class="btn btn-sky btn-sm">Nueva reserva</a>
+</div>
+
+<div class="panel-card p-3 p-md-4 mb-4">
+  <div class="row g-3">
+    <div class="col-12 col-md-4">
+      <label class="form-label small fw-semibold">Filtrar por estado</label>
+      <select class="form-select" onchange="location.href='/cliente/reservas?filter=' + this.value">
+        <option value="prox" selected="@(filter == "prox")">Próximas</option>
+        <option value="comp" selected="@(filter == "comp")">Completadas</option>
+        <option value="canc" selected="@(filter == "canc")">Canceladas</option>
+      </select>
+    </div>
+    <div class="col-12 col-md-8">
+      <label for="myBookingSearch" class="form-label small fw-semibold">Buscar por código o vehículo</label>
+      <input id="myBookingSearch" type="search" class="form-control" placeholder="Ej. ABC123 o placa" oninput="filterMyBookings()" />
+    </div>
+  </div>
+</div>
 
 @if (Model.Any())
 {
-  <div class="tw">
-    <table>
-      <tr><th>Código</th><th>Fecha</th><th>Servicio</th><th>Vehículo</th><th>Precio</th><th>Estado</th><th></th></tr>
-      @foreach (var b in Model)
-      {
-        var pillCls = b.Status == "Cancelada" ? "er" : (b.Status == "Listo para recoger" || b.Status == "Entregada" ? "ok" : (b.Status == "Confirmada" ? "" : "wa"));
+  <div class="data-table-wrap">
+    <table class="data-table" id="myBookingsTable">
+      <thead>
         <tr>
-          <td>@b.BookingCode</td>
-          <td>@b.Date.ToString("dd/MM/yyyy") @b.TimeSlot</td>
-          <td>@b.ServiceName</td>
-          <td>@b.VehicleBrand @b.VehiclePlate</td>
-          <td>S/ @b.Price</td>
-          <td><span class="pill @pillCls">@b.Status</span></td>
-          <td><a href="/cliente/reservas/@b.Id">Ver</a></td>
+          <th>Código</th>
+          <th>Fecha</th>
+          <th>Servicio</th>
+          <th>Vehículo</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th></th>
         </tr>
-      }
+      </thead>
+      <tbody>
+        @foreach (var b in Model)
+        {
+          var badgeCls = b.Status == "Cancelada" ? "text-bg-danger" : (b.Status == "Listo para recoger" || b.Status == "Entregada" ? "text-bg-success" : (b.Status == "Confirmada" ? "text-bg-info" : "text-bg-warning"));
+          var blob = $"{b.BookingCode} {b.ServiceName} {b.VehicleBrand} {b.VehiclePlate}".ToLowerInvariant();
+          <tr data-search="@blob">
+            <td data-label="Código"><b>@b.BookingCode</b></td>
+            <td data-label="Fecha">@b.Date.ToString("dd/MM/yyyy") @b.TimeSlot</td>
+            <td data-label="Servicio">@b.ServiceName</td>
+            <td data-label="Vehículo">@b.VehicleBrand @b.VehiclePlate</td>
+            <td data-label="Precio"><span class="price-tag fs-6">S/ @b.Price</span></td>
+            <td data-label="Estado"><span class="badge @badgeCls">@b.Status</span></td>
+            <td data-label="Acción"><a href="/cliente/reservas/@b.Id" class="btn btn-sm btn-outline-info">Ver</a></td>
+          </tr>
+        }
+      </tbody>
     </table>
   </div>
 }
 else
 {
-  <div class="empty">No hay reservas para mostrar.</div>
+  <div class="panel-card p-5 text-center text-secondary">No hay reservas para mostrar.</div>
 }
+
+<script>
+function filterMyBookings() {
+  const q = (document.getElementById("myBookingSearch")?.value || "").trim().toLowerCase();
+  document.querySelectorAll("#myBookingsTable tbody tr").forEach((tr) => {
+    const txt = tr.getAttribute("data-search") || "";
+    tr.style.display = (!q || txt.includes(q)) ? "" : "none";
+  });
+}
+</script>

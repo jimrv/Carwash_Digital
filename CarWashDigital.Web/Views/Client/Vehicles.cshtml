@@ -5,45 +5,92 @@
     ViewData["ActiveSection"] = "cliente/vehiculos";
     var cats = new[] { "Sedán", "SUV", "Pick-up 4x4" };
 }
-<h2>Mis vehículos</h2>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="h3 fw-extrabold mb-1">Mis vehículos</h1>
+    <p class="text-secondary small mb-0">Registra tus autos para reservar turnos más rápido.</p>
+  </div>
+</div>
 
-@if (Model.Any())
-{
-  <div class="grid">
-    @foreach (var v in Model)
+<div class="row g-4 align-items-start">
+  <div class="col-12 col-lg-7">
+    @if (Model.Any())
     {
-      <div class="card">
-        <h3>@v.Brand @v.Model</h3>
-        <p>@v.Category · @v.Plate @v.Color</p>
-        <form asp-controller="Client" asp-action="DeleteVehicle" asp-route-id="@v.Id" method="post" onsubmit="return confirm('¿Eliminar este vehículo? Tu historial se conserva.')">
-          @Html.AntiForgeryToken()
-          <button type="submit" class="btn d sm">Eliminar</button>
-        </form>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Vehículo</th>
+              <th>Categoría</th>
+              <th>Placa</th>
+              <th>Color</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach (var v in Model)
+            {
+              <tr>
+                <td data-label="Vehículo"><b>@v.Brand @v.Model</b></td>
+                <td data-label="Categoría"><span class="badge text-bg-info">@v.Category</span></td>
+                <td data-label="Placa"><b>@v.Plate</b></td>
+                <td data-label="Color">@(string.IsNullOrWhiteSpace(v.Color) ? "—" : v.Color)</td>
+                <td data-label="Acción">
+                  <form asp-controller="Client" asp-action="DeleteVehicle" asp-route-id="@v.Id" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+                  </form>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    else
+    {
+      <div class="panel-card p-4 text-center text-secondary">
+        Aún no registraste vehículos. Usa el formulario para agregar el primero.
       </div>
     }
   </div>
-}
-else
-{
-  <div class="empty">Aún no registraste vehículos.</div>
-}
 
-<h3 style="margin-top:24px">Agregar vehículo</h3>
-<form asp-controller="Booking" asp-action="AddVehicle" method="post">
-  @Html.AntiForgeryToken()
-  <input type="hidden" name="ReturnToBooking" value="false" />
-  <div class="grid">
-    <div><label for="vb2">Marca</label><input id="vb2" name="Brand" required /></div>
-    <div><label for="vm2">Modelo</label><input id="vm2" name="Model" required /></div>
-    <div>
-      <label for="vc2">Categoría</label>
-      <select id="vc2" name="Category">
-        @foreach (var c in cats) { <option>@c</option> }
-      </select>
-    </div>
-    <div><label for="vp2">Placa</label><input id="vp2" name="Plate" required /></div>
-    <div><label for="vo2">Color (opcional)</label><input id="vo2" name="Color" /></div>
+  <div class="col-12 col-lg-5">
+    <form class="panel-card p-4" asp-controller="Client" asp-action="AddVehicle" method="post">
+      @Html.AntiForgeryToken()
+      <h2 class="h5 fw-bold mb-3">Agregar vehículo</h2>
+
+      <div class="mb-3">
+        <label for="vBrand" class="form-label fw-semibold">Marca</label>
+        <input id="vBrand" name="brand" class="form-control" placeholder="Ej. Toyota" required />
+      </div>
+
+      <div class="mb-3">
+        <label for="vModel" class="form-label fw-semibold">Modelo</label>
+        <input id="vModel" name="model" class="form-control" placeholder="Ej. Yaris" required />
+      </div>
+
+      <div class="mb-3">
+        <label for="vCat" class="form-label fw-semibold">Categoría</label>
+        <select id="vCat" name="category" class="form-select">
+          @foreach (var c in cats)
+          {
+            <option value="@c">@c</option>
+          }
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="vPlate" class="form-label fw-semibold">Placa</label>
+        <input id="vPlate" name="plate" class="form-control" placeholder="Ej. ABC-123" required />
+      </div>
+
+      <div class="mb-4">
+        <label for="vColor" class="form-label fw-semibold">Color (opcional)</label>
+        <input id="vColor" name="color" class="form-control" placeholder="Ej. Plata" />
+      </div>
+
+      <button type="submit" class="btn btn-sky w-100">Guardar vehículo</button>
+    </form>
   </div>
-  <p></p>
-  <button type="submit" class="btn">Guardar vehículo</button>
-</form>
+</div>

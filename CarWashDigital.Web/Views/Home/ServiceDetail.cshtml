@@ -1,0 +1,62 @@
+@model ServiceItem
+@{
+    ViewData["Title"] = Model.Name;
+    string ImgFor(string code) => code switch
+    {
+        "s1" => "/images/svc-express.jfif",
+        "s2" => "/images/svc-completo.jfif",
+        "s3" => "/images/svc-premium.jfif",
+        "s4" => "/images/hero-wash.jfif",
+        "f1" => "/images/svc-express.jfif",
+        "f2" => "/images/svc-premium.jfif",
+        _ => "/images/hero-wash.jfif"
+    };
+}
+<section class="container py-4 py-md-5">
+  <a href="/servicios" class="btn btn-outline-info btn-sm mb-4">← Volver a servicios</a>
+  <div class="panel-card p-4 p-md-5">
+    <div class="row g-4 align-items-center">
+      <div class="col-12 col-md-6">
+        <div class="hero-frame">
+          <img src="@ImgFor(Model.Code)" onerror="this.onerror=null;this.src='/images/hero-carwash.svg';" alt="@Model.Name" />
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          <span class="badge @(Model.IsFleetService ? "text-bg-primary" : "text-bg-info")">
+            @(Model.IsFleetService ? "Empresas · Flotas (+5 autos)" : "Servicio Individual")
+          </span>
+          <span class="badge text-bg-secondary">Duración aprox: @Model.DurationMinutes min</span>
+        </div>
+
+        <h1 class="h2 fw-extrabold mb-2">@Model.Name</h1>
+        <p class="text-secondary mb-4">@Model.Description</p>
+
+        <h3 class="h6 fw-bold">Tratamientos incluidos</h3>
+        <ul class="mb-4">
+          @foreach (var inc in Model.Includes)
+          {
+            <li>@inc</li>
+          }
+        </ul>
+
+        <h3 class="h6 fw-bold mb-2">
+          @(Model.IsFleetService ? "Tarifas por tipo de flota (precio por unidad)" : "Precios por tipo de vehículo")
+        </h3>
+        <div class="list-group mb-4 border rounded-3">
+          @foreach (var kv in Model.PricesByCategory)
+          {
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="fw-medium">@kv.Key</span>
+              <span class="price-tag">S/ @kv.Value</span>
+            </div>
+          }
+        </div>
+
+        <a class="btn btn-sky btn-lg px-4 w-100 w-sm-auto" href="/reservar/vehiculo?serviceId=@Model.Id">
+          Continuar con este servicio →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

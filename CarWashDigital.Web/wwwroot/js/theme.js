@@ -13,12 +13,16 @@
     return prefersDark();
   }
 
-  function updateButtons() {
+  function updateSwitches() {
     const dark = isDarkActive();
-    document.querySelectorAll("[data-theme-toggle]").forEach((btn) => {
-      btn.setAttribute("aria-pressed", String(dark));
-      btn.textContent = dark ? "☀️ Claro" : "🌙 Oscuro";
-      btn.title = dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro";
+    root.setAttribute("data-bs-theme", dark ? "dark" : "light");
+    document.querySelectorAll("[data-theme-toggle]").forEach((el) => {
+      el.setAttribute("aria-pressed", String(dark));
+      el.setAttribute("aria-label", dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro");
+      el.setAttribute("title", dark ? "Modo claro" : "Modo oscuro");
+      if (el.tagName === "INPUT" && el.type === "checkbox") {
+        el.checked = dark;
+      }
     });
   }
 
@@ -28,13 +32,21 @@
     } else {
       root.removeAttribute("data-theme");
     }
-    updateButtons();
+    updateSwitches();
   }
 
   applyTheme(localStorage.getItem(STORAGE_KEY));
 
+  document.addEventListener("change", (ev) => {
+    const sw = ev.target.closest("[data-theme-toggle]");
+    if (!sw) return;
+    const next = sw.checked ? "dark" : "light";
+    localStorage.setItem(STORAGE_KEY, next);
+    applyTheme(next);
+  });
+
   document.addEventListener("click", (ev) => {
-    const btn = ev.target.closest("[data-theme-toggle]");
+    const btn = ev.target.closest("button[data-theme-toggle]");
     if (!btn) return;
     const next = isDarkActive() ? "light" : "dark";
     localStorage.setItem(STORAGE_KEY, next);
@@ -43,7 +55,7 @@
 
   if (window.matchMedia) {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-      if (!localStorage.getItem(STORAGE_KEY)) updateButtons();
+      if (!localStorage.getItem(STORAGE_KEY)) updateSwitches();
     });
   }
 

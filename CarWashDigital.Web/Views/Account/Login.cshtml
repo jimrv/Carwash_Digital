@@ -1,24 +1,51 @@
 @model LoginVm
-@{ ViewData["Title"] = "Iniciar sesión"; }
-<div class="form">
-  <img class="logo" src="/images/logo.jpg" alt="Car Wash Digital" />
-  <h2>Iniciar sesión</h2>
-  <form asp-controller="Account" asp-action="Login" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="ReturnUrl" />
-    <div asp-validation-summary="ModelOnly" class="val-err"></div>
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5">
+      <div class="panel-card p-4 p-sm-5">
+        <div class="text-center mb-4">
+          <img src="/images/logo.jfif"
+               onerror="this.onerror=null;this.src='/images/logo.svg';"
+               alt="CarWash Digital"
+               style="height:82px;width:auto;max-width:180px;object-fit:contain;border-radius:12px"
+               class="mb-3" />
+          <h1 class="h3 fw-extrabold mb-1">Iniciar sesión</h1>
+          <p class="text-secondary small mb-0">Accede para gestionar tus reservas, vehículos o turnos.</p>
+        </div>
 
-    <label asp-for="Email">Correo electrónico</label>
-    <input asp-for="Email" type="email" required />
-    <span asp-validation-for="Email" class="val-err"></span>
+        <form asp-controller="Account" asp-action="Login" method="post">
+          @Html.AntiForgeryToken()
+          <input type="hidden" asp-for="ReturnUrl" />
+          <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
 
-    <label asp-for="Password">Contraseña</label>
-    <input id="pwLogin" asp-for="Password" type="password" required />
-    <span asp-validation-for="Password" class="val-err"></span>
+          <div class="mb-3">
+            <label asp-for="Email" class="form-label fw-semibold">Correo electrónico</label>
+            <input asp-for="Email" type="email" class="form-control form-control-lg" placeholder="nombre@correo.com" required />
+            <span asp-validation-for="Email" class="text-danger small"></span>
+          </div>
 
-    <p><input type="checkbox" style="width:auto;min-height:0" onclick="pwLogin.type=this.checked?'text':'password'" /> Mostrar contraseña</p>
-    <button type="submit" class="btn" style="width:100%">Iniciar sesión</button>
-  </form>
-  <p><a href="/recuperar">¿Olvidaste tu contraseña?</a> · <a href="/registro">Crear cuenta</a></p>
-  <small>Demo: cliente@demo.pe / demo123 · admin@demo.pe / admin123</small>
-</div>
+          <div class="mb-3">
+            <label asp-for="Password" class="form-label fw-semibold">Contraseña</label>
+            <input id="pwLogin" asp-for="Password" type="password" class="form-control form-control-lg" placeholder="••••••••" required />
+            <span asp-validation-for="Password" class="text-danger small"></span>
+          </div>
+
+          <div class="form-check mb-4">
+            <input id="showPw" type="checkbox" class="form-check-input" onclick="pwLogin.type=this.checked?'text':'password'" />
+            <label for="showPw" class="form-check-label small">Mostrar contraseña</label>
+          </div>
+
+          <button type="submit" class="btn btn-sky btn-lg w-100 mb-3">Iniciar sesión</button>
+        </form>
+
+        <div class="d-flex justify-content-between align-items-center small pt-2 border-top">
+          <a href="/recuperar" class="text-decoration-none">¿Olvidaste tu contraseña?</a>
+          <a href="/registro" class="text-decoration-none fw-semibold">Crear cuenta</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

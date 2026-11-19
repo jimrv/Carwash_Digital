@@ -25,10 +25,13 @@ public class AccountController : Controller
     {
         if (!ModelState.IsValid) return View(vm);
 
-        var email = vm.Email.Trim().ToLowerInvariant();
+        var email = (vm.Email ?? string.Empty).Trim().ToLowerInvariant();
+        var password = (vm.Password ?? string.Empty).Trim();
+
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-        if (user == null || _hasher.VerifyHashedPassword(user, user.PasswordHash, vm.Password) == PasswordVerificationResult.Failed)
+        if (user == null || string.IsNullOrWhiteSpace(user.PasswordHash) ||
+            _hasher.VerifyHashedPassword(user, user.PasswordHash, password) == PasswordVerificationResult.Failed)
         {
             ModelState.AddModelError("", "Correo o contraseña incorrectos.");
             return View(vm);
@@ -50,7 +53,7 @@ public class AccountController : Controller
     {
         if (!ModelState.IsValid) return View(vm);
 
-        var email = vm.Email.Trim().ToLowerInvariant();
+        var email = (vm.Email ?? string.Empty).Trim().ToLowerInvariant();
         if (await _db.Users.AnyAsync(u => u.Email == email))
         {
             ModelState.AddModelError(nameof(vm.Email), "Ese correo ya está registrado.");
@@ -67,7 +70,7 @@ public class AccountController : Controller
             CompanyName = string.IsNullOrWhiteSpace(vm.CompanyName) ? null : vm.CompanyName.Trim(),
             Ruc = string.IsNullOrWhiteSpace(vm.Ruc) ? null : vm.Ruc.Trim()
         };
-        user.PasswordHash = _hasher.HashPassword(user, vm.Password);
+        user.PasswordHash = _hasher.HashPassword(user, vm.Password.Trim());
 
         _db.Users.Add(user);
         await _db.SaveChangesAsync();

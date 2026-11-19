@@ -30,19 +30,6 @@ public class Vehicle
     public string Color { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
 }
-
-public class ServiceItem
-{
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public string Code { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
-    public List<string> Includes { get; set; } = new();
-    public int DurationMinutes { get; set; } = 30;
-    public bool IsActive { get; set; } = true;
-    public Dictionary<string, decimal> PricesByCategory { get; set; } = new();
-}
-
 public class Booking
 {
     public Guid Id { get; set; } = Guid.NewGuid();

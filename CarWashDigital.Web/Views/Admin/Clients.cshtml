@@ -1,31 +1,79 @@
 @model IEnumerable<AdminClientRowVm>
 @{
     Layout = "_LayoutApp";
-    ViewData["Title"] = "Clientes";
+    ViewData["Title"] = "Clientes y flotas";
     ViewData["ActiveSection"] = "admin/clientes";
 }
-<h2>Clientes</h2>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h1 class="h3 fw-extrabold mb-1">Clientes y flotas</h1>
+    <p class="text-secondary small mb-0">Filtra por nombre, empresa o tipo de cuenta.</p>
+  </div>
+</div>
+
+<div class="panel-card p-3 p-md-4 mb-4">
+  <div class="row g-3">
+    <div class="col-12 col-md-7">
+      <label for="clientSearch" class="form-label small fw-semibold">Buscar cliente o empresa</label>
+      <input id="clientSearch" type="search" class="form-control" placeholder="Escribe nombre, correo o empresa..." oninput="filterClients()" />
+    </div>
+    <div class="col-12 col-md-5">
+      <label for="clientTypeFilter" class="form-label small fw-semibold">Tipo de cuenta</label>
+      <select id="clientTypeFilter" class="form-select" onchange="filterClients()">
+        <option value="">Todos</option>
+        <option value="Individual">Particular</option>
+        <option value="Fleet">Flota / Empresa</option>
+      </select>
+    </div>
+  </div>
+</div>
+
 @if (Model.Any())
 {
-  <div class="tw">
-    <table>
-      <tr><th>Nombre</th><th>Tipo / Empresa</th><th>Correo</th><th>Celular</th><th>Vehículos</th><th>Completadas</th><th>Canceladas</th></tr>
-      @foreach (var u in Model)
-      {
+  <div class="data-table-wrap">
+    <table class="data-table" id="clientsTable">
+      <thead>
         <tr>
-          <td>@u.Name</td>
-          <td>@(u.AccountType == "Fleet" ? $"Flota ({u.CompanyName})" : "Particular")</td>
-          <td>@u.Email</td>
-          <td>@u.Phone</td>
-          <td>@u.VehiclesCount</td>
-          <td>@u.CompletedCount</td>
-          <td>@u.CancelledCount</td>
+          <th>Nombre</th>
+          <th>Tipo / Empresa</th>
+          <th>Contacto</th>
+          <th>Vehículos</th>
+          <th>Completadas</th>
+          <th>Canceladas</th>
         </tr>
-      }
+      </thead>
+      <tbody>
+        @foreach (var u in Model)
+        {
+          var searchBlob = $"{u.Name} {u.Email} {u.CompanyName} {u.Phone}".ToLowerInvariant();
+          <tr data-search="@searchBlob" data-type="@u.AccountType">
+            <td data-label="Nombre"><b>@u.Name</b></td>
+            <td data-label="Tipo / Empresa">@(u.AccountType == "Fleet" ? $"Flota · {u.CompanyName}" : "Particular")</td>
+            <td data-label="Contacto">@u.Email · @u.Phone</td>
+            <td data-label="Vehículos"><span class="badge text-bg-info">@u.VehiclesCount</span></td>
+            <td data-label="Completadas"><span class="badge text-bg-success">@u.CompletedCount</span></td>
+            <td data-label="Canceladas"><span class="badge text-bg-secondary">@u.CancelledCount</span></td>
+          </tr>
+        }
+      </tbody>
     </table>
   </div>
 }
 else
 {
-  <div class="empty">Sin clientes registrados.</div>
+  <div class="panel-card p-5 text-center text-secondary">Sin clientes registrados.</div>
 }
+
+<script>
+function filterClients() {
+  const q = (document.getElementById("clientSearch")?.value || "").trim().toLowerCase();
+  const t = document.getElementById("clientTypeFilter")?.value || "";
+  document.querySelectorAll("#clientsTable tbody tr").forEach((tr) => {
+    const hay = tr.getAttribute("data-search") || "";
+    const tipo = tr.getAttribute("data-type") || "";
+    const okQ = !q || hay.includes(q);
+    const okT = !t || tipo === t;
+    tr.style.display = (okQ && okT) ? "" : "none";
+  });
+}
+</script>

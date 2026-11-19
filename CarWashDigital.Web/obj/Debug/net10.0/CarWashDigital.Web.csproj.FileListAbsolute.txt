@@ -170,10 +170,10 @@
 /workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/scopedcss/Views/Shared/_Layout.cshtml.rz.scp.css
 /workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/scopedcss/bundle/CarWashDigital.Web.styles.css
 /workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/scopedcss/projectbundle/CarWashDigital.Web.bundle.scp.css
-/workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/sdgbvsp3iz-{0}-2gzrq705q2-2gzrq705q2.gz
+/workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/sdgbvsp3iz-{0}-m3czoru2p4-m3czoru2p4.gz
 /workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/4dhzloic58-{0}-61n19gt1b8-61n19gt1b8.gz
 /workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/ru8xkt5x52-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
-/workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/xsjcv40gpf-{0}-h9d6rn1v52-h9d6rn1v52.gz
+/workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/xsjcv40gpf-{0}-v6a4ousp9b-v6a4ousp9b.gz
 /workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/4qygrodusx-{0}-bqjiyaj88i-bqjiyaj88i.gz
 /workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/ks75l8bdan-{0}-c2jlpeoesf-c2jlpeoesf.gz
 /workspaces/Carwash_Digital/CarWashDigital.Web/obj/Debug/net10.0/compressed/1l65fz5sam-{0}-erw9l3u2r3-erw9l3u2r3.gz

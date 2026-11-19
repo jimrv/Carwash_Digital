@@ -23,6 +23,23 @@ public class BookingController : Controller
         _bookingService = bookingService;
     }
 
+    public static string? ResolveCategoryKey(ServiceItem service, string vehicleCategory)
+    {
+        if (service.PricesByCategory.ContainsKey(vehicleCategory))
+            return vehicleCategory;
+
+        if (service.IsFleetService)
+        {
+            if (vehicleCategory.Contains("Sedán", StringComparison.OrdinalIgnoreCase))
+                return service.PricesByCategory.Keys.FirstOrDefault(k => k.Contains("Sedán", StringComparison.OrdinalIgnoreCase));
+            if (vehicleCategory.Contains("SUV", StringComparison.OrdinalIgnoreCase))
+                return service.PricesByCategory.Keys.FirstOrDefault(k => k.Contains("SUV", StringComparison.OrdinalIgnoreCase));
+            if (vehicleCategory.Contains("Pick-up", StringComparison.OrdinalIgnoreCase))
+                return service.PricesByCategory.Keys.FirstOrDefault(k => k.Contains("Pick-up", StringComparison.OrdinalIgnoreCase));
+        }
+        return null;
+    }
+
     [HttpGet("servicio")]
     public async Task<IActionResult> ServiceStep()
     {
@@ -41,15 +58,19 @@ public class BookingController : Controller
             return RedirectToAction(nameof(ServiceStep));
         }
 
-        var vehicles = await _db.Vehicles
-            .Where(v => v.UserId == userId && v.IsActive && service.PricesByCategory.ContainsKey(v.Category))
+        var userVehicles = await _db.Vehicles
+            .Where(v => v.UserId == userId && v.IsActive)
             .OrderBy(v => v.Brand).ThenBy(v => v.Model)
             .ToListAsync();
+
+        var compatibleVehicles = userVehicles
+            .Where(v => ResolveCategoryKey(service, v.Category) != null)
+            .ToList();
 
         return View(new VehicleStepVm
         {
             Service = service,
-            Vehicles = vehicles,
+            Vehicles = compatibleVehicles,
             RescheduleId = rescheduleId
         });
     }
@@ -121,7 +142,8 @@ public class BookingController : Controller
         if (service == null || vehicle == null || customer == null)
             return RedirectToAction(nameof(ServiceStep));
 
-        if (!service.PricesByCategory.TryGetValue(vehicle.Category, out var price))
+        var key = ResolveCategoryKey(service, vehicle.Category);
+        if (key == null || !service.PricesByCategory.TryGetValue(key, out var price))
             return RedirectToAction(nameof(ServiceStep));
 
         return View(new ConfirmStepVm

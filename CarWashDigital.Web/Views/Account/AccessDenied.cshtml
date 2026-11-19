@@ -1,6 +1,10 @@
-@{ ViewData["Title"] = "Acceso denegado"; }
-<section class="s">
-  <h2>Acceso denegado</h2>
-  <p>Tu cuenta no tiene permisos para esta sección.</p>
-  <a class="btn" href="/cliente">Ir a mi cuenta</a>
+@{
+    ViewData["Title"] = "Acceso restringido";
+}
+<section class="container py-5">
+  <div class="panel-card p-5 text-center mx-auto" style="max-width:540px">
+    <h1 class="h3 fw-extrabold mb-2">Acceso restringido</h1>
+    <p class="text-secondary mb-4">No tienes permisos para acceder a esta sección con tu cuenta actual.</p>
+    <a href="/" class="btn btn-sky px-4">Volver al inicio</a>
+  </div>
 </section>

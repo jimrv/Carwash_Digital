@@ -7,12 +7,12 @@
     var canModify = Model.Status == "Confirmada";
 }
 <h2>Reserva @Model.BookingCode</h2>
-<div class="card" style="max-width:640px">
+<div class="card" style="max-width:680px">
   <p>
     <b>@Model.ServiceName</b> <span class="pill @pillCls">@Model.Status</span><br />
-    Vehículo: @Model.VehicleBrand @Model.VehicleModel · @Model.VehicleCategory · @Model.VehiclePlate<br />
+    Vehículo: @Model.VehicleBrand @Model.VehicleModel · @Model.VehicleCategory · <b>@Model.VehiclePlate</b><br />
     Fecha: @Model.Date.ToString("dd/MM/yyyy") @Model.TimeSlot<br />
-    Precio confirmado: <b>S/ @Model.Price</b>
+    Precio confirmado: <span class="pr">S/ @Model.Price</span>
   </p>
   <ul>
     @foreach (var inc in Model.ServiceIncludes) { <li>@inc</li> }
@@ -22,7 +22,7 @@
 
   @if (canModify)
   {
-    <p style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
       <form asp-controller="Client" asp-action="Reschedule" asp-route-id="@Model.Id" method="post">
         @Html.AntiForgeryToken()
         <button type="submit" class="btn s sm">Reprogramar</button>
@@ -31,10 +31,10 @@
         @Html.AntiForgeryToken()
         <button type="submit" class="btn d sm">Cancelar reserva</button>
       </form>
-    </p>
+    </div>
   }
 
-  <h3>Historial</h3>
+  <h3 style="margin-top:20px">Historial</h3>
   <ul>
     @foreach (var h in Model.History.OrderBy(x => x.ChangedAt))
     {

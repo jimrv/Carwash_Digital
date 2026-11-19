@@ -1,6 +1,11 @@
 @model IEnumerable<ServiceItem>
-@{ ViewData["Title"] = "Servicios y precios"; }
-<section class="s">
-  <h2>Servicios y precios</h2>
+@{
+    ViewData["Title"] = "Servicios y tarifas";
+}
+<section class="container py-4 py-md-5">
+  <div class="mb-4">
+    <h1 class="h2 fw-extrabold mb-1">Servicios y tarifas</h1>
+    <p class="text-secondary mb-0">Elige entre planes individuales para clientes básicos o paquetes corporativos para flotas de más de 5 autos.</p>
+  </div>
   @await Html.PartialAsync("_ServiceGrid", Model)
 </section>

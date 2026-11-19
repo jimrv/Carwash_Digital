@@ -72,7 +72,8 @@ public class BookingService : IBookingService
         if (service == null || vehicle == null)
             return new BookingResult(false, null, "Servicio o vehículo inválido.");
 
-        if (!service.PricesByCategory.TryGetValue(vehicle.Category, out var price))
+        var catKey = CarWashDigital.Web.Controllers.BookingController.ResolveCategoryKey(service, vehicle.Category);
+        if (catKey == null || !service.PricesByCategory.TryGetValue(catKey, out var price))
             return new BookingResult(false, null, "No hay tarifa configurada para la categoría de tu vehículo.");
 
         var code = await GenerateUniqueCodeAsync();
